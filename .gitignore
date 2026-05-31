@@ -1,0 +1,14 @@
+# Dependencies (none today, but guard against future tooling)
+node_modules/
+
+# Logs
+*.log
+
+# Local Claude Code overrides — never commit machine-specific settings
+.claude/settings.local.json
+
+# Editors / OS cruft
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
