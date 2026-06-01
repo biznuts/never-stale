@@ -32,7 +32,7 @@ pitfalls.
 
 ```text
 /plugin marketplace add biznuts/never-stale
-/plugin install never-stale@never-stale
+/plugin install never-stale@biznuts
 ```
 
 Then, in any project you want to keep in sync:
@@ -55,8 +55,8 @@ New versions don't apply by themselves — installed plugins are pinned to the
 version you installed. To pull a newer release:
 
 ```text
-/plugin marketplace update never-stale
-/plugin install never-stale@never-stale
+/plugin marketplace update biznuts
+/plugin install never-stale@biznuts
 ```
 
 Then **restart Claude Code** (or run `/reload-plugins`) so the new command and

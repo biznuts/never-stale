@@ -1,9 +1,9 @@
 {
-  "name": "never-stale",
+  "name": "biznuts",
   "owner": {
     "name": "biznuts"
   },
-  "description": "Marketplace hosting the never-stale plugin for Claude Code.",
+  "description": "biznuts's Claude Code plugin marketplace.",
   "plugins": [
     {
       "name": "never-stale",
