@@ -21,16 +21,24 @@ literal string `<ROOT>`.
 
 ## Step 0 — Ask the user for language preferences
 
-Use the **AskUserQuestion** tool to ask two things (offer English as the default
-first option, plus a couple of common choices, and let them pick "Other" to type
-any language):
+Use the **AskUserQuestion** tool to ask the two questions below. For **both**
+questions, offer exactly these four options, **in this order** (the AskUserQuestion
+tool adds an "Other" choice automatically, so the user can still type any language):
+
+1. **English** — the default (first option)
+2. **Traditional Chinese**
+3. **Traditional Chinese (Hong Kong)**
+4. **Simplified Chinese**
+
+Ask:
 
 1. **Spoken replies** — what language should the assistant talk to the user in?
    (default: **English**)
 2. **Written files** — what language should newly written docs/specs/READMEs/code
    comments default to? (default: **English**)
 
-Call the chosen values `<SPOKEN>` and `<WRITTEN>`. Use them in Step 1.
+The first option (**English**) is the default for each. Call the chosen values
+`<SPOKEN>` and `<WRITTEN>`. Use them in Step 1.
 
 ## Step 1 — `<ROOT>/CLAUDE.md`  (create, or merge these rules if it exists)
 
