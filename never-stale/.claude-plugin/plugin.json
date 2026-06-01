@@ -1,6 +1,6 @@
 {
   "name": "never-stale",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Keep your project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Per-project, opt-in via the /never-stale command.",
   "author": {
     "name": "biznuts"

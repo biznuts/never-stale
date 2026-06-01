@@ -68,10 +68,14 @@ the language or rules later just means editing that file.
 - **Dry-run by default.** Every run inspects the project first and shows a plan
   (create / merge / update / skip) for your approval before touching a file. Pass
   `--dry-run` to preview only and write nothing.
-- **Idempotent, with real duplicate detection.** Re-running merges/updates instead
-  of duplicating. It detects its own hooks by their command (`never-stale-reminder.js`)
-  and skips them on a re-run; if it finds a *foreign* hook on the same event, it
-  flags the double-fire and asks before adding.
+- **Idempotent, with real conflict detection.** Re-running merges/updates instead
+  of duplicating. It detects its own hooks by their command
+  (`never-stale-reminder.js`) — across **both** `settings.json` and
+  `settings.local.json` — and skips them on a re-run. If it finds a *foreign* hook
+  on the same event (in either file), or a `CLAUDE.md` that already states its own
+  language / doc / post-compact rule, it surfaces the conflict in the plan and
+  makes you **resolve it before anything is written** (apply anyway / skip that
+  piece / cancel).
 - **Configurable language.** The command asks for your spoken-reply language and
   your written-file default language at scaffold time (both default to English).
 

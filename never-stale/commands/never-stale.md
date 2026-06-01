@@ -46,49 +46,73 @@ The first option (**English**) is the default for each. Call the chosen values
 ## Step 1 — Inspect the project and build a plan
 
 Before writing anything, detect the current state of each artifact and decide its
-action. Use Glob / Read (read `<ROOT>/.claude/settings.json` as JSON if present).
+action. Use Glob / Read, and parse **both** `<ROOT>/.claude/settings.json` and
+`<ROOT>/.claude/settings.local.json` as JSON if present.
 
 - **`<ROOT>/CLAUDE.md`**
-  - missing → **CREATE**
-  - exists, no `## Language` section → **MERGE** (add the three sections)
-  - exists, has `## Language` → **UPDATE** (reconcile that section to `<SPOKEN>` /
-    `<WRITTEN>`; do not add a second Language section)
+  - missing → **CREATE**.
+  - exists with a top-level `## Language` section → **UPDATE** (reconcile it to
+    `<SPOKEN>` / `<WRITTEN>`; never add a second Language section).
+  - exists and already states a language, doc-maintenance, or post-compact rule
+    under a *different* heading or structure (e.g. a `### 語言` / `## 語言` heading,
+    a `## Standing Rules`, a "source of truth" doc discipline, a compact
+    self-check) → **CONFLICT (review)**: the project already has its own
+    convention. Do NOT blindly append the generic sections — that would duplicate
+    and may contradict it (e.g. the project writes docs in one language while this
+    template would default to another). Surface the existing rule in Step 2 and let
+    the user resolve.
+  - exists with none of the above → **MERGE** (append the three sections).
 - **`<ROOT>/.claude/hooks/never-stale-reminder.js`**
-  - missing → **CREATE**
-  - exists → **SKIP** (the script is static and identical; never duplicate)
-- **`<ROOT>/.claude/settings.json`** — parse it, then for **each** of the two hooks
-  (`SessionStart`/`compact` and `PostToolUse`/`Edit|Write|MultiEdit`) decide
-  independently. **Duplicate detection** keys off the command string:
-  - file missing → **CREATE** the file with both hooks.
-  - an existing hook at that event whose `command` contains
-    **`never-stale-reminder.js`** → **SKIP** (never-stale already installed there;
-    re-running must NOT add a second copy).
-  - an existing **foreign** hook at the same event+matcher (a `command` that does
-    NOT contain `never-stale-reminder.js`) → **CONFLICT**: both would fire (double
-    reminder). Flag it for an explicit confirm in Step 2; do not add silently.
-  - otherwise → **ADD** the hook to the existing arrays.
+  - missing → **CREATE**.
+  - exists → **SKIP** (the script is static and identical; never duplicate).
+- **Existing hooks** — for **each** of never-stale's two hooks (`SessionStart` /
+  `compact` and `PostToolUse` / `Edit|Write|MultiEdit`), look across **both**
+  `settings.json` **and** `settings.local.json` (either may register hooks — the
+  local file frequently does). Duplicate detection keys off the command string:
+  - never-stale's own hook already present (a `command` containing
+    **`never-stale-reminder.js`**) in **either** file → **SKIP** (already
+    installed; never add a second copy).
+  - a **foreign** hook at the same event+matcher (a `command` WITHOUT
+    `never-stale-reminder.js`) in **either** file → **CONFLICT**: both would fire
+    (double reminder). Record **which file** it lives in. Flag for resolution in
+    Step 2; never add silently.
+  - neither → **ADD** never-stale's hook.
+- **`<ROOT>/.claude/settings.json` file** — missing → **CREATE** with the planned
+  hooks; exists → **MERGE** the planned ADDs into it. never-stale only ever WRITES
+  to `settings.json`; it reads `settings.local.json` for detection but never
+  modifies it.
 
-## Step 2 — Dry-run preview and confirm
+## Step 2 — Dry-run preview, surface conflicts, and resolve before writing
 
-Show the user the plan as a short list, one line per artifact, e.g.:
+Show the user the plan as a short list, one line per artifact and per hook, marking
+each action (CREATE / MERGE / UPDATE / SKIP / ADD / CONFLICT). For every
+**CONFLICT**, show the specifics so the user can resolve it *before* anything is
+written:
+- hook conflict — name the event, the existing `command`, and **which file** it is
+  in (`settings.json` or `settings.local.json`);
+- CLAUDE.md conflict — quote the existing rule that overlaps.
+
+Example:
 
 ```
-CLAUDE.md                         CREATE
-.claude/hooks/never-stale-...js   SKIP (already present)
-settings.json · SessionStart      ADD
-settings.json · PostToolUse       CONFLICT — a non-never-stale Edit|Write hook exists
+CLAUDE.md                         CONFLICT — already has a "### 語言" rule (replies zh-HK; docs in Chinese)
+.claude/hooks/never-stale-...js   CREATE
+settings.json · PostToolUse       ADD
+SessionStart · compact            CONFLICT — settings.local.json already runs after-compact.ps1 on compact
 ```
 
+Then:
 - If invoked with **`--dry-run`**: stop here. Write nothing.
-- If every action is SKIP (project already fully set up): tell the user it is
-  already never-stale, nothing to do, and stop.
-- Otherwise use **AskUserQuestion** to confirm before writing: "Apply this plan?"
-  with options **Apply** / **Cancel**. If there is any **CONFLICT**, make the
-  consequence explicit (the duplicate hook will also fire) and let the user choose
-  to apply anyway, skip just the conflicting hook, or cancel. On Cancel, write
-  nothing.
+- If every action is SKIP (already fully set up): say it is already never-stale,
+  nothing to do, and stop.
+- Otherwise **resolve before writing**, via **AskUserQuestion**:
+  - No conflicts → a single **Apply** / **Cancel** is enough.
+  - Any conflicts → make the user resolve **each** one. Per conflict, offer:
+    **Apply anyway** (accept the duplicate / addition), **Skip this piece** (leave
+    the project's existing setup untouched for that item), or **Cancel everything**.
 
-Apply only the planned actions in Steps 3–5.
+Write nothing until the user has chosen, and apply only what they approved in
+Steps 3–5.
 
 ## Step 3 — `<ROOT>/CLAUDE.md`  (per the plan: CREATE / MERGE / UPDATE)
 
