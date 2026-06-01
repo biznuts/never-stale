@@ -41,8 +41,13 @@ Then, in any project you want to keep in sync:
 /never-stale
 ```
 
-It asks your language preferences, scaffolds the files, then asks you to **restart
-Claude Code** so the hooks load. `/hooks` will show them registered.
+It asks your language preferences, **shows you a plan** of exactly what it will
+create / merge / skip, and waits for your confirmation before writing anything.
+Then it scaffolds the files and asks you to **restart Claude Code** so the hooks
+load. `/hooks` will show them registered.
+
+Want to look before you leap? Run `/never-stale --dry-run` to print the plan and
+stop — nothing is written.
 
 ## How it works
 
@@ -60,8 +65,13 @@ the language or rules later just means editing that file.
 - **Per-project, opt-in.** Nothing is global. The plugin only ships the
   `/never-stale` command; it does not impose anything on any project automatically.
   Run the command where you want it; other projects are untouched.
-- **Idempotent.** Re-running merges/updates instead of duplicating. If the project
-  already has matching hooks, it warns before adding a duplicate.
+- **Dry-run by default.** Every run inspects the project first and shows a plan
+  (create / merge / update / skip) for your approval before touching a file. Pass
+  `--dry-run` to preview only and write nothing.
+- **Idempotent, with real duplicate detection.** Re-running merges/updates instead
+  of duplicating. It detects its own hooks by their command (`never-stale-reminder.js`)
+  and skips them on a re-run; if it finds a *foreign* hook on the same event, it
+  flags the double-fire and asks before adding.
 - **Configurable language.** The command asks for your spoken-reply language and
   your written-file default language at scaffold time (both default to English).
 

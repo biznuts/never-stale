@@ -1,6 +1,6 @@
 ---
 description: Make THIS project never-stale — scaffold language rules + doc-sync discipline + reminder hooks that survive auto-compact. Cross-platform (Node). Per-project, manual trigger only; touches no other project.
-argument-hint: "[optional project root path; defaults to the current working directory]"
+argument-hint: "[optional project root path; defaults to cwd] [--dry-run]"
 allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
 ---
 
@@ -10,14 +10,17 @@ Goal: stop the assistant from "forgetting" project conventions mid-session — k
 docs in sync, keep language consistent, and re-confirm the rules after every
 auto-compact.
 
-Do this NOW for the current project. Be **idempotent**: if a file already exists,
+Do this for the current project. Be **idempotent**: if a file already exists,
 merge/update it, never duplicate. Cross-platform: the hooks run via **Node**
 (Claude Code already requires Node), so this works on Windows, macOS, and Linux.
 
-**Project root** = `$ARGUMENTS` if a path was given, otherwise the current
-working directory. Call it `<ROOT>`. Wherever a template shows `<ROOT>`, substitute
-the **real absolute path** of the project root (you know the cwd) — never write the
-literal string `<ROOT>`.
+**Project root** = the path in `$ARGUMENTS` (ignoring any `--dry-run` flag) if a
+path was given, otherwise the current working directory. Call it `<ROOT>`. Wherever
+a template shows `<ROOT>`, substitute the **real absolute path** of the project root
+(you know the cwd) — never write the literal string `<ROOT>`.
+
+**Dry-run mode.** If `$ARGUMENTS` contains `--dry-run`, do Steps 0–2 only: ask
+preferences, inspect, print the plan — then STOP without writing anything.
 
 ## Step 0 — Ask the user for language preferences
 
@@ -38,9 +41,56 @@ Ask:
    comments default to? (default: **English**)
 
 The first option (**English**) is the default for each. Call the chosen values
-`<SPOKEN>` and `<WRITTEN>`. Use them in Step 1.
+`<SPOKEN>` and `<WRITTEN>`. Use them in Step 3.
 
-## Step 1 — `<ROOT>/CLAUDE.md`  (create, or merge these rules if it exists)
+## Step 1 — Inspect the project and build a plan
+
+Before writing anything, detect the current state of each artifact and decide its
+action. Use Glob / Read (read `<ROOT>/.claude/settings.json` as JSON if present).
+
+- **`<ROOT>/CLAUDE.md`**
+  - missing → **CREATE**
+  - exists, no `## Language` section → **MERGE** (add the three sections)
+  - exists, has `## Language` → **UPDATE** (reconcile that section to `<SPOKEN>` /
+    `<WRITTEN>`; do not add a second Language section)
+- **`<ROOT>/.claude/hooks/never-stale-reminder.js`**
+  - missing → **CREATE**
+  - exists → **SKIP** (the script is static and identical; never duplicate)
+- **`<ROOT>/.claude/settings.json`** — parse it, then for **each** of the two hooks
+  (`SessionStart`/`compact` and `PostToolUse`/`Edit|Write|MultiEdit`) decide
+  independently. **Duplicate detection** keys off the command string:
+  - file missing → **CREATE** the file with both hooks.
+  - an existing hook at that event whose `command` contains
+    **`never-stale-reminder.js`** → **SKIP** (never-stale already installed there;
+    re-running must NOT add a second copy).
+  - an existing **foreign** hook at the same event+matcher (a `command` that does
+    NOT contain `never-stale-reminder.js`) → **CONFLICT**: both would fire (double
+    reminder). Flag it for an explicit confirm in Step 2; do not add silently.
+  - otherwise → **ADD** the hook to the existing arrays.
+
+## Step 2 — Dry-run preview and confirm
+
+Show the user the plan as a short list, one line per artifact, e.g.:
+
+```
+CLAUDE.md                         CREATE
+.claude/hooks/never-stale-...js   SKIP (already present)
+settings.json · SessionStart      ADD
+settings.json · PostToolUse       CONFLICT — a non-never-stale Edit|Write hook exists
+```
+
+- If invoked with **`--dry-run`**: stop here. Write nothing.
+- If every action is SKIP (project already fully set up): tell the user it is
+  already never-stale, nothing to do, and stop.
+- Otherwise use **AskUserQuestion** to confirm before writing: "Apply this plan?"
+  with options **Apply** / **Cancel**. If there is any **CONFLICT**, make the
+  consequence explicit (the duplicate hook will also fire) and let the user choose
+  to apply anyway, skip just the conflicting hook, or cancel. On Cancel, write
+  nothing.
+
+Apply only the planned actions in Steps 3–5.
+
+## Step 3 — `<ROOT>/CLAUDE.md`  (per the plan: CREATE / MERGE / UPDATE)
 
 Substitute `<SPOKEN>` and `<WRITTEN>` with the user's answers.
 
@@ -62,11 +112,11 @@ Substitute `<SPOKEN>` and `<WRITTEN>` with the user's answers.
 - When unsure of the state, re-read this `CLAUDE.md` and the related docs; don't rely on chat memory.
 ```
 
-If `CLAUDE.md` already exists: merge these three sections in, preserving the
-project's existing content. If it already has a `## Language` section, reconcile
-(update it to match the user's answers) rather than adding a duplicate.
+On MERGE: add these three sections, preserving the project's existing content. On
+UPDATE: reconcile the existing `## Language` section to match the user's answers
+rather than adding a duplicate.
 
-## Step 2 — `<ROOT>/.claude/hooks/never-stale-reminder.js`  (create)
+## Step 4 — `<ROOT>/.claude/hooks/never-stale-reminder.js`  (per the plan: CREATE / SKIP)
 
 This single Node script powers both hooks. It is fully static (no substitution),
 emits UTF-8 JSON natively, and is cross-platform.
@@ -99,7 +149,7 @@ The reminders intentionally point back to `CLAUDE.md` (the single source of trut
 instead of hardcoding the language, so changing the language later only means
 editing `CLAUDE.md`.
 
-## Step 3 — `<ROOT>/.claude/settings.json`  (create, or MERGE the two hooks if it exists)
+## Step 5 — `<ROOT>/.claude/settings.json`  (per the plan: CREATE / ADD / SKIP)
 
 Substitute `<ROOT>` with the real absolute project path and escape backslashes for
 JSON (on Windows: `C:\\Users\\...`). The `PostToolUse` hook output MUST be JSON
@@ -137,14 +187,14 @@ Node script handles that.
 }
 ```
 
-If `settings.json` already exists: parse it, append these hook objects into the
-existing `hooks.SessionStart` / `hooks.PostToolUse` arrays (create the arrays /
-`hooks` key if missing), and write it back as valid JSON. Do not clobber other
-settings. If the project already has a `SessionStart` `compact` hook or a
-`PostToolUse` `Edit|Write` hook, warn the user that both will fire (double
-reminder) and ask before adding a duplicate.
+On CREATE: write the file above. On ADD: parse the existing `settings.json`, append
+the planned hook object(s) into the matching `hooks.SessionStart` /
+`hooks.PostToolUse` arrays (create the arrays / `hooks` key if missing), write it
+back as valid JSON, and do not clobber other settings. On SKIP: leave that hook
+untouched (never-stale is already there). Honor the Step 2 decision for any
+CONFLICT.
 
-## Step 4 — Verify
+## Step 6 — Verify
 
 Run the Node script both ways and confirm each prints valid JSON with the right
 `hookEventName`:
@@ -157,10 +207,11 @@ node "<ROOT>/.claude/hooks/never-stale-reminder.js" edit
 Confirm `compact` → `SessionStart`, `edit` → `PostToolUse`, and that
 `settings.json` parses as valid JSON.
 
-## Step 5 — Report
+## Step 7 — Report
 
 Tell the user (in the chosen spoken language):
-- which files were created vs merged,
+- the plan that was applied — which files were created vs merged vs updated vs
+  skipped (and any conflict the user resolved),
 - that hooks load only at session start, so they must **restart Claude Code** (or
   open a new session) in this project for the hooks to activate; `/hooks` shows
   them registered,
