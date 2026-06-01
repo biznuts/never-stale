@@ -49,6 +49,23 @@ load. `/hooks` will show them registered.
 Want to look before you leap? Run `/never-stale --dry-run` to print the plan and
 stop — nothing is written.
 
+## Updating
+
+New versions don't apply by themselves — installed plugins are pinned to the
+version you installed. To pull a newer release:
+
+```text
+/plugin marketplace update never-stale
+/plugin install never-stale@never-stale
+```
+
+Then **restart Claude Code** (or run `/reload-plugins`) so the new command and
+hooks load. To see which version you have, open `/plugin` and find never-stale in
+the list.
+
+> Already set up a project with an older version? Re-running `/never-stale` there
+> is safe — it detects what exists and skips/updates instead of duplicating.
+
 ## How it works
 
 | Piece | Mechanism | Why it survives compaction |
