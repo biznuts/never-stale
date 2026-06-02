@@ -49,6 +49,22 @@ load. `/hooks` will show them registered.
 Want to look before you leap? Run `/never-stale --dry-run` to print the plan and
 stop — nothing is written.
 
+### Removing it from a project
+
+`/never-stale` and `/never-stale --off` are a toggle — opt a project in, opt it
+out. Teardown removes **only** never-stale's own footprint (its hook script, its
+hooks in `settings.json`, and the `CLAUDE.md` sections it wrote that you haven't
+edited); it leaves your own content and `settings.local.json` untouched, shows a
+removal plan, and asks before deleting:
+
+```text
+/never-stale --off            # plan, confirm, then remove
+/never-stale --off --dry-run  # just show what would be removed
+```
+
+This is per-project. The plugin itself stays installed machine-wide — remove that
+with `/plugin uninstall never-stale@biznuts`.
+
 ## Updating
 
 New versions don't apply by themselves — installed plugins are pinned to the
@@ -95,6 +111,9 @@ the language or rules later just means editing that file.
   piece / cancel).
 - **Configurable language.** The command asks for your spoken-reply language and
   your written-file default language at scaffold time (both default to English).
+- **Reversible.** `/never-stale --off` is a symmetric teardown: it removes only
+  never-stale's own artifacts (with the same plan-and-confirm safety), leaving your
+  content and `settings.local.json` alone.
 
 ## Requirements
 

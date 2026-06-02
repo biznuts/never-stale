@@ -1,6 +1,6 @@
 ---
 description: Make THIS project never-stale — scaffold language rules + doc-sync discipline + reminder hooks that survive auto-compact. Cross-platform (Node). Per-project, manual trigger only; touches no other project.
-argument-hint: "[optional project root path; defaults to cwd] [--dry-run]"
+argument-hint: "[optional project root path; defaults to cwd] [--off] [--dry-run]"
 allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
 ---
 
@@ -19,8 +19,14 @@ path was given, otherwise the current working directory. Call it `<ROOT>`. Where
 a template shows `<ROOT>`, substitute the **real absolute path** of the project root
 (you know the cwd) — never write the literal string `<ROOT>`.
 
-**Dry-run mode.** If `$ARGUMENTS` contains `--dry-run`, do Steps 0–2 only: ask
-preferences, inspect, print the plan — then STOP without writing anything.
+**Mode.** Default = **set up** this project (Steps 0–7 below). If `$ARGUMENTS`
+contains **`--off`**, instead run **Teardown mode** (the section at the very end of
+this file) to remove never-stale's own setup from this project. The two are a
+toggle: `/never-stale` opts a project in, `/never-stale --off` opts it out.
+
+**Dry-run.** If `$ARGUMENTS` contains `--dry-run`, only inspect and print the plan,
+then STOP without writing or removing anything. Works with both modes — setup: do
+Steps 0–2 only; teardown: show the removal plan only.
 
 ## Step 0 — Ask the user for language preferences
 
@@ -240,3 +246,72 @@ Tell the user (in the chosen spoken language):
   open a new session) in this project for the hooks to activate; `/hooks` shows
   them registered,
 - that this command touched only this project.
+
+---
+
+# Teardown mode (`--off`)
+
+Reached only when `$ARGUMENTS` contains **`--off`**. This is the inverse of setup:
+remove never-stale's own footprint from this project and nothing else. It is the
+opt-out half of the toggle. Skip Steps 0–7 above entirely; run T1–T4 instead.
+
+**Safety contract.** Remove ONLY artifacts never-stale created. Never touch foreign
+hooks, user-authored `CLAUDE.md` prose, other settings, or `settings.local.json`
+(read it for awareness, never modify it). When in doubt, keep and report rather
+than delete. Like setup, show a plan and get confirmation before removing anything.
+
+## T1 — Detect never-stale's artifacts
+
+- **Hook script** `<ROOT>/.claude/hooks/never-stale-reminder.js` — present → **REMOVE
+  (delete file)**; absent → nothing.
+- **`<ROOT>/.claude/settings.json` hooks** — find every hook object whose `command`
+  contains **`never-stale-reminder.js`** (these are never-stale's). Plan to remove
+  exactly those. (Never-stale only ever wrote to `settings.json`, so only look
+  there for removal. If a never-stale hook somehow appears in `settings.local.json`,
+  do NOT edit that file — report it for manual removal.)
+- **`<ROOT>/CLAUDE.md` sections** — the three never-stale headings: `## Language`,
+  `## Doc maintenance`, `## Auto-compact note`. For each present heading, compare
+  its body to never-stale's template (Step 3 above):
+  - body matches the template (unmodified) → **REMOVE (safe)**;
+  - body was edited by the user, or the heading also holds non-template content →
+    **KEEP + flag** (it is now user content; do not destroy it).
+
+## T2 — Removal plan (dry-run) and confirm
+
+Show a plan, one line per artifact, e.g.:
+
+```
+.claude/hooks/never-stale-reminder.js   REMOVE
+settings.json · SessionStart/compact    REMOVE (never-stale hook)
+settings.json · PostToolUse             REMOVE (never-stale hook)
+CLAUDE.md · ## Language                 KEEP — edited since scaffold (yours now)
+CLAUDE.md · ## Doc maintenance          REMOVE (matches template)
+CLAUDE.md · ## Auto-compact note        REMOVE (matches template)
+```
+
+- If `$ARGUMENTS` also has `--dry-run`: stop here, remove nothing.
+- If nothing is detected: say the project has no never-stale setup, nothing to do,
+  stop.
+- Otherwise confirm via **AskUserQuestion**: **Remove** / **Cancel**. For any item
+  flagged KEEP, let the user choose to remove it anyway (it is their content now).
+  Remove nothing until the user confirms.
+
+## T3 — Apply the removal
+
+- Delete the hook script file if planned.
+- `settings.json`: parse it, remove only the never-stale hook objects. Then prune
+  empties — an emptied `matcher` block, an emptied `SessionStart` / `PostToolUse`
+  array, and an emptied `hooks` key — but preserve the file and every other
+  setting. If the file would become `{}`, leave `{}` (do not delete the file).
+- `CLAUDE.md`: delete only the approved sections, preserving all other content and
+  spacing. If removing them leaves nothing but the `# Project rules` title (i.e.
+  never-stale wrote the whole file), offer to delete the file; otherwise keep it.
+- Never modify `settings.local.json`.
+
+## T4 — Report
+
+Tell the user (in their spoken language): what was removed vs kept (and why a KEEP
+was kept), that the hooks stop firing only after a **restart** (they are still
+loaded in the current session), that the plugin itself is still installed
+machine-wide (use `/plugin uninstall never-stale@biznuts` to remove that), and that
+only this project was touched.
