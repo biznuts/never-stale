@@ -8,7 +8,7 @@
     {
       "name": "never-stale",
       "source": "./never-stale",
-      "description": "Keep a project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Per-project, opt-in."
+      "description": "Keep a project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Per-project opt-in via a marker file; symmetric install/uninstall."
     }
   ]
 }

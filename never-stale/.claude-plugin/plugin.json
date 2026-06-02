@@ -1,7 +1,7 @@
 {
   "name": "never-stale",
-  "version": "0.5.0",
-  "description": "Keep your project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Per-project, opt-in via the /never-stale command.",
+  "version": "0.6.0",
+  "description": "Keep your project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Hooks ship in the plugin and are gated per-project by a marker file, so /never-stale opts a project in, /never-stale --off opts it out, and /plugin uninstall removes every hook machine-wide with no per-project surgery.",
   "author": {
     "name": "biznuts"
   },

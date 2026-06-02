@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "never-stale/marker@1",
+  "title": "never-stale per-project opt-in marker",
+  "description": "Presence of this file (with enabled:true) at <project root>/.claude/ is how the plugin-owned hooks know to act in this project. .claude/never-stale.json is committed (team-shared); .claude/never-stale.local.json is gitignored (machine-local, and overrides the committed one). A corrupt or missing marker is treated as DISABLED.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["enabled"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "never-stale/marker@1"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Must be exactly true for the hooks to act. Anything else = disabled."
+    },
+    "version": {
+      "type": "string",
+      "description": "never-stale version that wrote this marker, e.g. \"0.6.0\"."
+    },
+    "spoken": {
+      "type": "string",
+      "description": "Spoken-reply language recorded at scaffold time (informational; the rule itself lives in CLAUDE.md)."
+    },
+    "written": {
+      "type": "string",
+      "description": "Default written-file language recorded at scaffold time (informational)."
+    },
+    "events": {
+      "type": "object",
+      "description": "Per-event switches. Omit an event or set true to keep it on; set false to turn just that reminder off.",
+      "additionalProperties": false,
+      "properties": {
+        "compact": { "type": "boolean", "default": true },
+        "edit": { "type": "boolean", "default": true }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "ISO-8601 timestamp the marker was written (informational)."
+    }
+  }
+}
