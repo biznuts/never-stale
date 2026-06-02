@@ -38,9 +38,22 @@ effect without a reinstall (run `/reload-plugins` if you change `hooks.json`,
 
 ## Testing the gate
 
-The gate reads its payload on stdin and uses `CLAUDE_PROJECT_DIR` (falling back to the
-stdin `cwd`) as the *start* directory, from which it walks up to the nearest marker.
-You can exercise it directly:
+Run the automated suite (no dependencies — Node's built-in test runner):
+
+```bash
+node --test test/*.test.mjs
+```
+
+It builds throwaway fixture repos under your temp directory and asserts the gate's
+fire/silent behavior: an enabled marker, the upward walk from a subdirectory, a
+disabled or corrupt marker, an out-of-project edit, the per-event opt-outs, and the
+fail-safe contract (exit 0, nothing on stderr). The same suite runs in CI
+(`.github/workflows/ci.yml`) on every push and pull request, alongside a JSON-validity
+check of every shipped file.
+
+To exercise the gate by hand, it reads its payload on stdin and uses
+`CLAUDE_PROJECT_DIR` (falling back to the stdin `cwd`) as the *start* directory, from
+which it walks up to the nearest marker:
 
 ```bash
 GATE=never-stale/hooks/never-stale-gate.js

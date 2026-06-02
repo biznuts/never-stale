@@ -9,6 +9,7 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![platforms](https://img.shields.io/badge/platforms-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-lightgrey.svg)](#requirements)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://docs.claude.com/en/docs/claude-code)
+[![CI](https://github.com/biznuts/never-stale/actions/workflows/ci.yml/badge.svg)](https://github.com/biznuts/never-stale/actions/workflows/ci.yml)
 
 <p align="center">
   <img src="assets/demo.png" alt="never-stale re-injects your project's rules right after an auto-compact, so the assistant keeps your language and keeps the docs in sync" width="760">

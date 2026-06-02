@@ -6,6 +6,8 @@ node_modules/
 
 # Local Claude Code overrides — never commit machine-specific settings
 .claude/settings.local.json
+# Personal never-stale opt-in / language override (overrides the committed marker)
+.claude/never-stale.local.json
 
 # Editors / OS cruft
 .idea/

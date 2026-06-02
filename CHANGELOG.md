@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
+## [Unreleased]
+
+_Repository tooling and documentation only — no change to the installed plugin's behavior._
+
+### Added
+- Continuous integration (`.github/workflows/ci.yml`): syntax-checks the gate,
+  validates every shipped JSON file, confirms the plugin/marketplace entry, and runs
+  the gate test suite on every push and pull request.
+- A dependency-free gate test suite (`test/gate.test.mjs`) covering fire/silent
+  behavior, the upward marker walk, disabled/corrupt markers, out-of-project edits,
+  per-event opt-outs, and the fail-safe contract.
+- Community files and a value-first README revamp with demo images: `CHANGELOG`,
+  `CONTRIBUTING`, `SECURITY`, and issue/PR templates.
+- The repository now **dogfoods** never-stale on itself — a committed marker
+  (`.claude/never-stale.json`) plus a sentinel-fenced `CLAUDE.md`.
+
 ## [0.6.0] - 2026-06-02
 
 ### Changed
@@ -86,6 +102,7 @@ The installed version is the `version` field in
   and a `PostToolUse`/`Edit|Write` doc-sync nudge, a parametrized-language `CLAUDE.md`
   scaffold, and idempotent setup via `/never-stale`.
 
+[Unreleased]: https://github.com/biznuts/never-stale/compare/a3bff08...HEAD
 [0.6.0]: https://github.com/biznuts/never-stale/compare/8947de7...a3bff08
 [0.5.0]: https://github.com/biznuts/never-stale/compare/e1a5bf2...8947de7
 [0.4.2]: https://github.com/biznuts/never-stale/compare/0eeb9df...e1a5bf2
