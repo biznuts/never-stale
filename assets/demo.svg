@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 472" width="760" height="472" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" role="img" aria-label="A Claude Code terminal: after an auto-compact, never-stale re-injects the project rules, so the assistant keeps the language and syncs the docs.">
+  <defs>
+    <style>
+      .t  { fill:#c9d1d9; font-size:13px; }
+      .dim{ fill:#6e7681; font-size:13px; }
+      .ok { fill:#3fb950; font-size:13px; }
+      .ns { fill:#e0936f; font-size:13px; font-weight:700; }
+      .nstxt { fill:#d6c0b6; font-size:13px; }
+      .cap{ fill:#8b949e; font-size:12px; }
+      .ttl{ fill:#8b949e; font-size:12px; }
+    </style>
+  </defs>
+
+  <!-- window -->
+  <rect x="1" y="1" width="758" height="470" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <!-- title bar -->
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/>
+  <circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/>
+  <circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">claude code — myproject</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- transcript -->
+  <text x="28" y="70" class="dim">› two hours into the session…</text>
+
+  <!-- compact divider -->
+  <text x="28" y="100" class="dim">────────  context auto-compacted (conversation summarized)  ────────</text>
+
+  <!-- never-stale box #1 (compact) -->
+  <rect x="24" y="116" width="712" height="60" rx="6" fill="#1c1410" stroke="#5c3a2a" stroke-width="1"/>
+  <rect x="24" y="116" width="4" height="60" rx="2" fill="#d97757"/>
+  <text x="40" y="141" class="ns">[never-stale]<tspan class="nstxt" dx="6">Auto-compact happened — re-confirm CLAUDE.md still applies:</tspan></text>
+  <text x="40" y="162" class="nstxt">spoken &amp; written language, and sync related docs after every change.</text>
+
+  <!-- assistant keeps the rule -->
+  <text x="28" y="206" class="ok">✓ 收到 — replies stay in 繁體中文(香港); written files stay in English.</text>
+
+  <!-- edit event -->
+  <text x="28" y="244" class="dim">✎ edited  <tspan class="t">src/auth.ts</tspan></text>
+
+  <!-- never-stale box #2 (edit) -->
+  <rect x="24" y="260" width="712" height="40" rx="6" fill="#1c1410" stroke="#5c3a2a" stroke-width="1"/>
+  <rect x="24" y="260" width="4" height="40" rx="2" fill="#d97757"/>
+  <text x="40" y="285" class="ns">[never-stale]<tspan class="nstxt" dx="6">A file was edited — check if README / CLAUDE.md need a sync.</tspan></text>
+
+  <!-- assistant syncs docs -->
+  <text x="28" y="330" class="ok">✓ Updated README.md and CLAUDE.md to match the change.</text>
+
+  <!-- caption strip -->
+  <line x1="24" y1="356" x2="736" y2="356" stroke="#21262d" stroke-width="1"/>
+  <text x="28" y="384" class="cap">Fires right after a compaction · and right after edits · only in projects you opt in.</text>
+  <text x="28" y="406" class="cap">The rules live in your <tspan fill="#c9d1d9">CLAUDE.md</tspan>; a marker file is the per-project switch.</text>
+
+  <!-- footer brand -->
+  <text x="28" y="448" fill="#484f58" font-size="12">never-stale · a Claude Code plugin</text>
+  <text x="732" y="448" text-anchor="end" fill="#484f58" font-size="12">github.com/biznuts/never-stale</text>
+</svg>

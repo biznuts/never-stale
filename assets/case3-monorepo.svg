@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 396" width="760" height="396" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" role="img" aria-label="In a monorepo, a root marker covers everything and the gate walks up to the nearest one; a subtree overrides it — here jp-app uses Japanese while the rest stays English.">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .dir{fill:#7ee787;font-size:13px;} .ok{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:13px;} .blue{fill:#58a6ff;font-size:13px;}
+    .ttl{fill:#8b949e;font-size:12px;} .h{fill:#c9d1d9;font-size:13px;font-weight:700;}
+  </style>
+  <rect x="1" y="1" width="758" height="394" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">a monorepo · mixed languages</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- file tree -->
+  <text x="28" y="64" class="dir">myrepo/</text>
+  <text x="28" y="88" class="t">├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← root marker · written: English</tspan></text>
+  <text x="28" y="112" class="t">├─ <tspan class="dir">packages/</tspan></text>
+  <text x="28" y="136" class="t">│&#160;&#160;├─ <tspan class="dir">web/</tspan><tspan class="dim" dx="6">inherits the root marker → English</tspan></text>
+  <text x="28" y="160" class="t">│&#160;&#160;└─ <tspan class="dir">jp-app/</tspan><tspan class="dim" dx="6">serves the Japan market</tspan></text>
+  <text x="28" y="184" class="t">│&#160;&#160;&#160;&#160;&#160;├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← override · written: </tspan><tspan class="t">日本語</tspan></text>
+  <text x="28" y="208" class="t">│&#160;&#160;&#160;&#160;&#160;└─ <tspan class="dir">src/</tspan><tspan class="blue" dx="6">◀ you launch Claude in here</tspan></text>
+
+  <line x1="24" y1="230" x2="736" y2="230" stroke="#21262d" stroke-width="1"/>
+
+  <!-- resolution -->
+  <text x="28" y="256" class="t">launch in <tspan class="dir">jp-app/src/</tspan>&#160;&#160;<tspan class="blue">walk up ↑</tspan>&#160;&#160;nearest marker = jp-app&#160;&#160;→&#160;&#160;<tspan class="t">日本語</tspan></text>
+  <text x="28" y="282" class="t">launch in <tspan class="dir">packages/web/</tspan>&#160;&#160;<tspan class="blue">walk up ↑</tspan>&#160;&#160;nearest marker = root&#160;&#160;→&#160;&#160;<tspan class="ok">English</tspan></text>
+  <text x="28" y="308" class="dim">the walk stops at the git repo root — a marker outside the repo never governs it.</text>
+
+  <text x="28" y="346" class="dim">Nearest-ancestor-wins (like .editorconfig). One root marker covers all; any subtree overrides.</text>
+  <text x="28" y="378" fill="#484f58" font-size="12">Case 3 · a monorepo · upward walk + per-subtree override</text>
+</svg>

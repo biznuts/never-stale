@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 412" width="760" height="412" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" role="img" aria-label="Without never-stale the assistant drifts back to English after an auto-compact; with never-stale it stays in Traditional Chinese (Hong Kong).">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .ok{fill:#3fb950;font-size:13px;} .bad{fill:#f85149;font-size:13px;}
+    .ns{fill:#e0936f;font-size:13px;font-weight:700;} .nstxt{fill:#d6c0b6;font-size:13px;}
+    .lbl{font-size:13px;font-weight:700;} .ttl{fill:#8b949e;font-size:12px;}
+  </style>
+  <rect x="1" y="1" width="758" height="410" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">a long session, just after auto-compact</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Without -->
+  <text x="28" y="66" class="bad lbl">✗  Without never-stale</text>
+  <text x="28" y="92" class="dim">──── context auto-compacted (your top-of-session rules summarized away) ────</text>
+  <text x="28" y="118" class="dim">› 幫我加個 login endpoint</text>
+  <text x="28" y="144" class="t">Sure — I'll add the login endpoint and wire up the handler…</text>
+  <text x="28" y="170" class="bad">↑ slipped back to English — it forgot you wanted 繁體中文(香港)</text>
+
+  <line x1="24" y1="194" x2="736" y2="194" stroke="#21262d" stroke-width="1"/>
+
+  <!-- With -->
+  <text x="28" y="222" class="ok lbl">✓  With never-stale</text>
+  <rect x="24" y="236" width="712" height="52" rx="6" fill="#1c1410" stroke="#5c3a2a" stroke-width="1"/>
+  <rect x="24" y="236" width="4" height="52" rx="2" fill="#d97757"/>
+  <text x="40" y="261" class="ns">[never-stale]<tspan class="nstxt" dx="6">Auto-compact happened — re-confirm CLAUDE.md:</tspan></text>
+  <text x="40" y="280" class="nstxt">spoken replies stay in 繁體中文(香港).</text>
+  <text x="28" y="316" class="dim">› 幫我加個 login endpoint</text>
+  <text x="28" y="342" class="t">好,我而家加 login endpoint,順手 wire 埋 handler。</text>
+  <text x="28" y="368" class="ok">↑ stayed in 繁體中文(香港) — no need to remind it</text>
+
+  <text x="28" y="398" fill="#484f58" font-size="12">Case 1 · solo dev · a local marker keeps your language across compactions</text>
+</svg>

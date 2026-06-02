@@ -1,79 +1,170 @@
 # never-stale
 
-> Keep your project's **docs, language, and conventions in sync** through the whole
-> session — and surviving auto-compact. A Claude Code plugin.
+> Your Claude Code assistant keeps drifting — it forgets to update the docs, forgets
+> which language you wanted, and after an **auto-compact** it loses the rules you set
+> at the top of the session. **never-stale** keeps those rules in front of it the
+> whole way through.
 
-The problem: in a long Claude Code session, the assistant quietly drifts. It forgets
-to update the docs after a change, forgets which language you wanted, and after an
-**auto-compact** it loses the rules you set at the top of the conversation.
+[![version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbiznuts%2Fnever-stale%2Fmain%2Fnever-stale%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=2dba4e)](https://github.com/biznuts/never-stale/releases)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![platforms](https://img.shields.io/badge/platforms-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-lightgrey.svg)](#requirements)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757.svg)](https://docs.claude.com/en/docs/claude-code)
 
-`never-stale` fixes that without you having to repeat yourself. Run one command in a
-project and it opts that project in; the plugin's hooks keep the rules in front of
-the assistant — including right after every compaction.
+<p align="center">
+  <img src="assets/demo.png" alt="never-stale re-injects your project's rules right after an auto-compact, so the assistant keeps your language and keeps the docs in sync" width="760">
+</p>
 
-## What it does
+> The image above illustrates the experience. To record your own GIF, see
+> [`docs/recording-a-demo.md`](docs/recording-a-demo.md).
 
-The plugin ships two hooks (a `SessionStart`/`compact` reminder and a
-`PostToolUse`/`Edit|Write|MultiEdit` doc-sync nudge) **inside the plugin itself**.
-Once installed they are registered machine-wide, but they only **act** in a project
-you opted into. The switch is a tiny **marker file**.
+## Why you want this
 
-Running `/never-stale` in a project writes just two project-owned things:
+In a long Claude Code session the assistant quietly drifts:
 
-1. **A `CLAUDE.md` rules block** (wrapped in `<!-- never-stale:begin … end -->`
-   sentinels), auto-loaded every session and re-injected after compaction:
-   - the language for spoken replies,
-   - the default language for written files,
-   - "after any code change, sync the related docs."
-2. **An opt-in marker** — `.claude/never-stale.json` (committed, team-shared) or
-   `.claude/never-stale.local.json` (gitignored, just this machine). Its presence,
-   with `"enabled": true`, is what tells the plugin's hooks to act here.
+- it stops updating `README` / docs after it changes the code,
+- it slips back to English when you asked for another language,
+- and after an **auto-compact** — when the conversation is summarized to free up
+  context — it forgets the rules you set at the very top.
 
-No hook and no script are written into your project. The reminders are produced by
-the plugin-owned gate script, which runs in every session but **self-gates** on the
-marker: no marker → it exits silently, so projects you never opted into are
-untouched.
+You *can* put those rules in `CLAUDE.md`, and Claude Code reloads that file each
+session. But reloading a file is passive: nothing **reminds** the assistant to act on
+it at the two moments that matter — right after a compaction, and right after it
+edits a file. never-stale adds exactly those two nudges, and only in the projects you
+opt in.
 
-The hooks run via **Node** (which Claude Code already requires), so the same setup
-works on **Windows, macOS, and Linux** — no shell-specific scripts, no encoding
-pitfalls.
+## Use cases
 
-## Install
+### Stay in your language across compactions
+
+<p align="center"><img src="assets/case1-language.png" alt="After an auto-compact, the assistant slips back to English without never-stale, but stays in Traditional Chinese (Hong Kong) with it" width="760"></p>
+
+A solo dev whose replies should be in Traditional Chinese (Hong Kong) but whose code
+and docs stay in English. After an auto-compact the assistant would quietly slip back
+to English — never-stale re-confirms the rule the moment it happens, so it doesn't.
+Opt in with a **local marker** (just this machine).
+
+### Enforce doc-sync for the whole team
+
+<p align="center"><img src="assets/case2-team.png" alt="A committed marker means every teammate with the plugin gets the doc-sync reminder after editing code" width="760"></p>
+
+A team whose standard is "change the code, update the docs." Commit the marker once and
+every teammate with the plugin gets the doc-sync nudge after each edit — the opt-in
+travels with the repo, so there is **no per-developer setup**. Opt in with a
+**committed (team) marker**.
+
+### One root marker, per-subtree overrides (monorepo)
+
+<p align="center"><img src="assets/case3-monorepo.png" alt="In a monorepo a root marker covers everything; the gate walks up to the nearest marker, and a subtree like jp-app overrides it with Japanese" width="760"></p>
+
+A monorepo whose root defaults to English docs, but whose `jp-app` package serves the
+Japan market and needs Japanese. A marker at the root covers everything; the gate walks
+**up** to the nearest one, so launching from any subdirectory resolves the right rules.
+`jp-app` drops its own marker (`日本語`) to override — nearest-ancestor-wins, bounded by
+the git repo root.
+
+## Quickstart
 
 ```text
 /plugin marketplace add biznuts/never-stale
 /plugin install never-stale@biznuts
 ```
 
-Installing changes nothing observable on its own — the gate runs in every session
-but stays silent until a project has a marker. Then, in any project you want to keep
+Installing changes nothing observable on its own. Then, in any project you want kept
 in sync:
 
 ```text
 /never-stale
 ```
 
-It asks your language preferences and whether to opt the project in for the **whole
-team** (committed marker) or **just this machine** (gitignored marker), **shows you a
-plan** of exactly what it will write, and waits for your confirmation. Because the
-hooks already ship with the plugin, you usually **don't need to restart** — the new
-marker arms them for the next session immediately.
+It asks your languages, shows a plan of exactly what it will write, and waits for
+your OK. Because the hooks ship inside the plugin, you usually **don't need to
+restart** — the marker arms them for the next session immediately.
 
-Want to look before you leap? Run `/never-stale --dry-run` to print the plan and
-stop — nothing is written.
+Want to look before you leap? `/never-stale --dry-run` prints the plan and writes
+nothing.
 
-### Team vs local opt-in
+## How it works (30 seconds)
 
-- **Whole team** → `.claude/never-stale.json` is committed. Anyone on the team who
-  has the plugin installed gets the reminders in this repo after they pull. (The
-  opt-in travels with the repo — an intentional team decision.)
+```mermaid
+flowchart LR
+    A[Plugin installed<br/>machine-wide] --> B[Gate runs in<br/>every session]
+    B --> C{Marker found<br/>up to repo root?}
+    C -- no --> D[Exit silently<br/>project untouched]
+    C -- yes + enabled --> E[Inject a reminder<br/>as context]
+    E --> F[after compact: re-confirm rules<br/>after edit: sync the docs]
+```
+
+The plugin ships two hooks **inside itself** — a `SessionStart`/`compact` reminder
+and a `PostToolUse`/`Edit|Write|MultiEdit` doc-sync nudge. Once installed they are
+registered machine-wide, so the gate script **runs** in every session — but it only
+**acts** where you dropped an opt-in **marker**. No marker → it exits silently, so
+projects you never opted into are untouched. Running is not acting.
+
+Running `/never-stale` writes just two project-owned things, and **no** hook or
+script into your project:
+
+1. **A `CLAUDE.md` rules block** (wrapped in `<!-- never-stale:begin … end -->`
+   sentinels): the language for spoken replies, the default language for written
+   files, and "after any code change, sync the related docs."
+2. **An opt-in marker** — `.claude/never-stale.json` (committed, team-shared) or
+   `.claude/never-stale.local.json` (gitignored, just this machine). Its presence,
+   with `"enabled": true`, is what tells the plugin's hooks to act here.
+
+<details>
+<summary><b>The full mechanism</b> (marker resolution, sentinels, fail-safe)</summary>
+
+<br/>
+
+**Finding the marker — an upward walk.** `${CLAUDE_PROJECT_DIR}` (and the stdin
+`cwd`) is the directory Claude Code was *launched* from, which is often a
+subdirectory of the project. So the gate walks **up** from there to the nearest
+ancestor carrying a marker (nearest-ancestor-wins, like `.editorconfig` /
+`.gitignore`), bounded by the **git repo root** so a marker outside the repo can
+never govern it. Consequences:
+
+- launching from a subdirectory still works;
+- a marker at a monorepo root covers everything below it;
+- a subtree can opt **out** with its own `"enabled": false` marker;
+- a true sibling subtree (never an ancestor of where you are) is never touched.
+
+**Sentinel-fenced `CLAUDE.md`.** The rules block is wrapped in
+`<!-- never-stale:begin v=… hash=… -->` / `<!-- never-stale:end -->`. Teardown keys
+off that fence pair, so removal is reliable **even after you edit the text inside**.
+The hash is informational only (it powers a "you edited this" notice).
+
+**Fail-safe by construction.** The gate never throws, never exits non-zero, never
+writes to stderr. On any doubt it exits silently with no output. "Failing safe" means
+"no reminder" — never "fire in a project you didn't opt into". A corrupt or
+half-written marker is treated as disabled.
+
+| Piece | Mechanism | Why it survives compaction |
+|-------|-----------|----------------------------|
+| Rules | `CLAUDE.md` (sentinel-fenced) | Loaded into context every session, re-injected after compaction |
+| Compact reminder | Plugin `SessionStart` hook, matcher `compact` | Fires right after auto-compact — in opted-in projects only |
+| Doc-sync reminder | Plugin `PostToolUse` hook, matcher `Edit\|Write\|MultiEdit` | Fires after each file change; path-gated to edits inside the project |
+| Per-project gate | `.claude/never-stale.json` / `.local.json` marker | The machine-wide hook acts only where a marker with `enabled:true` exists |
+
+</details>
+
+The hooks run via **Node** (which Claude Code already requires), so the same setup
+works on **Windows, macOS, and Linux** — no shell-specific scripts, no encoding
+pitfalls.
+
+## Team vs local opt-in
+
+`/never-stale` asks whether to opt the project in for the **whole team** or **just
+this machine**:
+
+- **Whole team** → `.claude/never-stale.json` is committed. Anyone with the plugin
+  installed gets the reminders in this repo after they pull. (The opt-in travels with
+  the repo — an intentional team decision.)
 - **Just this machine** → `.claude/never-stale.local.json` is gitignored; only your
   checkout is opted in.
 - A **local marker overrides a committed one**, so a teammate who doesn't want the
   reminders can run `/never-stale --off` (or set `"enabled": false` in a local
   marker) to veto an inherited team opt-in, without changing the repo.
 
-### Removing it from a project
+## Removing it from a project
 
 `/never-stale` and `/never-stale --off` are a toggle. Teardown deletes the marker
 (disarming the gate for new sessions immediately) and removes the sentinel-fenced
@@ -84,19 +175,16 @@ a plan and asks first:
 ```text
 /never-stale --off            # plan, confirm, then remove
 /never-stale --off --dry-run  # just show what would be removed
+/never-stale --list           # find every opted-in / legacy project on disk
 ```
-
-Forgot which projects you enabled? `/never-stale --list` globs your disk for markers
-(and legacy installs) and lists every opted-in project.
 
 This is per-project. The plugin itself stays installed machine-wide — remove that
 with `/plugin uninstall never-stale@biznuts`, which removes **every** hook in one
-step (see *Lifecycle* below).
+step (see [Lifecycle](#lifecycle)).
 
 ## Updating
 
-New versions don't apply by themselves — installed plugins are pinned to the version
-you installed. To pull a newer release:
+Installed plugins are pinned to the version you installed. To pull a newer release:
 
 ```text
 /plugin marketplace update biznuts
@@ -106,77 +194,68 @@ you installed. To pull a newer release:
 Then **restart Claude Code** (or run `/reload-plugins`) so the new command and hooks
 load. To see which version you have, open `/plugin` and find never-stale in the list.
 
-### Upgrading from 0.5.0
+<details>
+<summary>Upgrading from 0.5.0</summary>
 
-0.5.0 wrote a script and two hooks into each project's `.claude/settings.json`.
-0.6.0 moves the hooks into the plugin and gates them on a marker. The upgrade is
-safe and gradual:
+<br/>
 
-- Upgrading the plugin alone changes **nothing observable**: a not-yet-migrated
-  0.5.0 project has no marker, so the new plugin gate stays silent there, while the
-  old project-local hook keeps working exactly as before. **No double reminders.**
-- The next time you run `/never-stale` in such a project, it detects the legacy
-  script + settings hooks, removes them, wraps the existing `CLAUDE.md` sections in
-  a sentinel fence (keeping your text), and writes a marker. After a restart the
-  project runs purely on the plugin-owned, marker-gated hook.
+0.5.0 wrote a script and two hooks into each project's `.claude/settings.json`. 0.6.0
+moves the hooks into the plugin and gates them on a marker. The upgrade is safe and
+gradual:
+
+- Upgrading the plugin alone changes **nothing observable**: a not-yet-migrated 0.5.0
+  project has no marker, so the new plugin gate stays silent there, while the old
+  project-local hook keeps working exactly as before. **No double reminders.**
+- The next time you run `/never-stale` in such a project, it detects the legacy script
+  + settings hooks, removes them, wraps the existing `CLAUDE.md` sections in a
+  sentinel fence (keeping your text), and writes a marker. After a restart the project
+  runs purely on the plugin-owned, marker-gated hook.
 - Never migrate a project? Its self-contained 0.5.0 setup keeps working. Use
   `/never-stale --list` to find old installs and `/never-stale --off` to clean them.
 
-## How it works
-
-| Piece | Mechanism | Why it survives compaction |
-|-------|-----------|----------------------------|
-| Rules | `CLAUDE.md` (sentinel-fenced) | Loaded into context every session, re-injected after compaction |
-| Compact reminder | Plugin `SessionStart` hook, matcher `compact` | Fires right after auto-compact — in opted-in projects only |
-| Doc-sync reminder | Plugin `PostToolUse` hook, matcher `Edit\|Write\|MultiEdit` | Fires after each file change, emitted as `additionalContext` JSON; path-gated to edits inside the project |
-| Per-project gate | `.claude/never-stale.json` / `.local.json` marker, read at runtime | The machine-wide hook acts only where a marker with `enabled:true` exists |
-
-`${CLAUDE_PROJECT_DIR}` (and the stdin `cwd`) is the directory Claude Code was
-*launched* from — often a subdirectory of the project. So the gate walks **up** from
-there to the nearest ancestor carrying a marker (nearest-ancestor-wins, like
-`.editorconfig` / `.gitignore`), bounded by the **git repo root** so a marker outside
-the repo can never govern it. This means launching from a subdirectory still works, a
-marker at a monorepo root covers everything below it, and a subtree can opt out with
-its own `"enabled": false` marker — while a true sibling subtree (never an ancestor of
-where you are) is never touched. The reminders point back to `CLAUDE.md` (the single
-source of truth), so changing the language or rules later just means editing that file.
+</details>
 
 ## Lifecycle
 
-- **Install the plugin** → hooks register machine-wide but stay silent everywhere
-  (no markers yet).
+- **Install the plugin** → hooks register machine-wide but stay silent everywhere (no
+  markers yet).
 - **`/never-stale`** in a project → writes a marker + a `CLAUDE.md` block; the hooks
   now act there.
-- **`/never-stale --off`** → deletes the marker and the fenced block; the project
-  goes silent again.
-- **`/plugin uninstall never-stale@biznuts`** → removes the plugin's hooks and
-  script **machine-wide, atomically**. Every project instantly stops firing, with no
+- **`/never-stale --off`** → deletes the marker and the fenced block; the project goes
+  silent again.
+- **`/plugin uninstall never-stale@biznuts`** → removes the plugin's hooks and script
+  **machine-wide, atomically**. Every project instantly stops firing, with no
   per-project hook surgery.
 
-This is symmetric **for execution**: uninstalling leaves **zero executable code** in
-any project. What can remain after a bare uninstall is inert data — the marker JSON
-(nothing reads it once the gate is gone) and the sentinel-fenced rules in your
-`CLAUDE.md` (your own project prose). To purge that too, run `/never-stale --off` in
-each project first (use `/never-stale --list` to find them all).
+Uninstalling leaves **zero executable code** in any project. What can remain after a
+bare uninstall is inert data — the marker JSON (nothing reads it once the gate is
+gone) and the sentinel-fenced rules in your `CLAUDE.md` (your own project prose). To
+purge that too, run `/never-stale --off` in each project first.
 
-## Design notes
+## FAQ
 
-- **Per-project, opt-in.** The plugin's hooks run everywhere but act nowhere until a
-  project carries a marker. `/never-stale` is how you opt a project in; nothing is
-  imposed on a project automatically. (For the committed-marker tier, the opt-in is a
-  team decision that travels with the repo; a local marker lets any machine opt out.)
-- **Dry-run by default.** Every run inspects the project first and shows a plan for
-  your approval before touching a file. Pass `--dry-run` to preview only.
-- **Idempotent, with real conflict detection.** Re-running merges/updates instead of
-  duplicating. If it finds a `CLAUDE.md` that already states its own language / doc /
-  post-compact rule under a different structure, it surfaces the conflict and makes
-  you resolve it before writing.
-- **Configurable language.** The command asks for your spoken-reply and written-file
-  default languages at scaffold time (both default to English).
-- **Reliable, symmetric teardown.** Hooks live in the plugin, so `/plugin uninstall`
-  removes them everywhere with no per-project residue of executable code. `--off`
-  removes a project's marker and its sentinel-fenced block reliably — even after you
-  edit the block — because removal keys off the sentinels, not a byte match.
+**Does it send my code or prompts anywhere?**
+No. Everything runs locally as a Node hook. There is no network call and no telemetry.
+
+**Does it cost extra tokens?**
+Only two short reminders, and only in opted-in projects: one right after a compaction,
+and one after a file edit. In projects without a marker the gate emits nothing.
+
+**Will it fight my existing `CLAUDE.md`?**
+`/never-stale` inspects first. If your `CLAUDE.md` already states a language /
+doc-maintenance / post-compact rule under its own structure, it flags the conflict and
+makes you resolve it before writing — it never blindly appends a duplicate.
+
+**Is uninstall really clean?**
+Yes for executable code: the hooks live in the plugin, so `/plugin uninstall` removes
+them everywhere at once. The only leftovers are inert data (the marker + your own
+`CLAUDE.md` prose), which `/never-stale --off` clears per project.
+
+**Why not just rely on `CLAUDE.md`?**
+`CLAUDE.md` is reloaded each session, but nothing *prompts* the assistant to act on it
+at the moments it drifts. never-stale adds an active nudge right after compaction and
+right after edits — the two points where "I have the rules in context" and "I actually
+applied them" diverge.
 
 ## Requirements
 
@@ -190,6 +269,11 @@ environment before launching Claude Code; the gate then appends one JSON diagnos
 line per invocation to `never-stale-debug.log` in your OS temp directory (resolved
 start dir, the project root it walked up to, whether a marker was found, and the
 fire/silent decision). It is off by default and never changes behavior.
+
+## Contributing
+
+Issues and PRs are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). The
+[CHANGELOG](CHANGELOG.md) tracks every release.
 
 ## License
 
