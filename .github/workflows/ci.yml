@@ -1,0 +1,61 @@
+name: CI
+
+# Lightweight gate for a zero-dependency plugin: the only executable is the hook
+# gate script, so we check that it parses, that every shipped JSON file is valid,
+# and that the gate's fire/silent behavior still holds.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Syntax-check the hook gate
+        run: node --check never-stale/hooks/never-stale-gate.js
+
+      - name: Validate JSON files
+        run: |
+          node -e '
+            const fs = require("fs");
+            const files = [
+              ".claude-plugin/marketplace.json",
+              "never-stale/.claude-plugin/plugin.json",
+              "never-stale/hooks/hooks.json",
+              "never-stale/marker.schema.json",
+            ];
+            let bad = 0;
+            for (const f of files) {
+              try { JSON.parse(fs.readFileSync(f, "utf8")); console.log("ok   " + f); }
+              catch (e) { bad++; console.error("FAIL " + f + " — " + e.message); }
+            }
+            process.exit(bad ? 1 : 0);
+          '
+
+      - name: Check plugin/marketplace versions agree
+        run: |
+          node -e '
+            const fs = require("fs");
+            const plugin = JSON.parse(fs.readFileSync("never-stale/.claude-plugin/plugin.json", "utf8"));
+            const market = JSON.parse(fs.readFileSync(".claude-plugin/marketplace.json", "utf8"));
+            const entry = (market.plugins || []).find(p => p.name === plugin.name);
+            if (!entry) { console.error("FAIL marketplace has no entry for " + plugin.name); process.exit(1); }
+            console.log("plugin.json version: " + plugin.version);
+            if (entry.version && entry.version !== plugin.version) {
+              console.error("FAIL marketplace version " + entry.version + " != plugin version " + plugin.version);
+              process.exit(1);
+            }
+            console.log("ok   versions agree");
+          '
+
+      - name: Run gate behavior tests
+        run: node --test test/*.test.mjs
