@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 300" width="1280" height="300" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK KR', monospace" role="img" aria-label="never-stale —— 한 번 정하면, 다시 흔들리지 않는다. 프로젝트 규칙을 매번의 자동 압축을 넘어 Claude 앞에 유지하는 Claude Code 플러그인.">
   <rect width="1280" height="300" fill="#0d1117"/>
-  <rect x="980" y="0" width="300" height="300" fill="#10161f"/>
 
   <g transform="translate(150,-7) scale(0.6)">
     <path d="M 307.3 115 A 150 150 0 1 1 204.7 115" fill="none" stroke="#d97757" stroke-width="34" stroke-linecap="round"/>
