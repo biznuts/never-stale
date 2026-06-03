@@ -10,6 +10,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Least privilege: this workflow only reads the repo (checkout + node checks).
+# Pull-request runs execute contributor-authored test code, so the token must not
+# be able to write anything.
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
