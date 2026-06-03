@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.svg" alt="never-stale logo" width="120" height="120">
+  <img src="assets/i18n/zh-Hant/banner.png" alt="never-stale —— 一次設定,永不走樣。Claude Code 外掛。" width="880">
 </p>
 
 # never-stale

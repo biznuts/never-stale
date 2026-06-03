@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.svg" alt="never-stale logo" width="120" height="120">
+  <img src="assets/i18n/ko/banner.png" alt="never-stale —— 한 번 정하면, 다시 흔들리지 않는다. Claude Code 플러그인." width="880">
 </p>
 
 # never-stale
