@@ -42,6 +42,7 @@ frame (rounded `#0d1117` panel, `#161b22` title bar, three traffic-light dots).
 | `assets/social-preview.svg` / `.png` | 1280×640 banner — bare glyph + `never-stale` wordmark + tagline on the dark background. | GitHub **Social preview** (must be uploaded manually under repo Settings — no API/CLI for it). |
 | `assets/hero.png` (`hero.svg`) | Before/after still: rules drift vs. rules held, after an auto-compact. | README hero (above the fold). |
 | `assets/commands.svg` / `.png` | State machine of the verb subcommands: `setup` opts in (gate fires); `off`/`on` pause/resume; `remove` tears down; `update` reconciles bookkeeping; `status`/`list` are read-only. | README `Lifecycle` section (below the fold). |
+| `assets/manage.svg` / `.png` | Cheat sheet for the management verbs, grouped: `off`/`on` (pause · reversible), `remove` + `--dry-run` (teardown), `list` (find projects). | README `Pausing or removing it from a project` section. |
 | `assets/demo.svg` / `.png` | Hand-drawn terminal: the `[never-stale]` reminders firing after a compact and after an edit. | README `How it works` section. |
 | `assets/case1-language` · `case2-team` · `case3-monorepo` | The three use-case scenarios. | README `Use cases`. |
 
