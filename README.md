@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.svg" alt="never-stale logo" width="120" height="120">
+</p>
+
 # never-stale
 
 > Your Claude Code assistant keeps drifting — it forgets to update the docs, forgets

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" role="img" aria-label="never-stale — a Claude Code plugin that keeps your project rules fresh through every auto-compact">
+  <!-- background -->
+  <rect width="1280" height="640" fill="#0d1117"/>
+
+  <!-- glyph (the icon's ring + rules, no tile) -->
+  <g transform="translate(141.3,161.3) scale(0.62)">
+    <path d="M 307.3 115 A 150 150 0 1 1 204.7 115" fill="none" stroke="#d97757" stroke-width="34" stroke-linecap="round"/>
+    <path d="M 232.9 104.8 L 206.6 137.7 L 191.6 96.3 Z" fill="#d97757"/>
+    <rect x="196" y="218" width="120" height="16" rx="8" fill="#e0936f"/>
+    <rect x="196" y="248" width="96"  height="16" rx="8" fill="#8b949e"/>
+    <rect x="196" y="278" width="72"  height="16" rx="8" fill="#6e7681"/>
+  </g>
+
+  <!-- wordmark + tagline -->
+  <text x="470" y="315" fill="#c9d1d9" font-size="96" font-weight="700">never-stale</text>
+  <text x="472" y="372" fill="#8b949e" font-size="30">Rules that survive every auto-compact.</text>
+  <text x="472" y="420" fill="#d97757" font-size="28">a Claude Code plugin</text>
+  <text x="472" y="470" fill="#484f58" font-size="24">github.com/biznuts/never-stale</text>
+</svg>
