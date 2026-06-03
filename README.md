@@ -213,6 +213,8 @@ pitfalls.
 
 ## Pausing or removing it from a project
 
+<p align="center"><img src="assets/manage.png" alt="Managing never-stale in a project: /never-stale:off pauses (reversible) and :on resumes; :remove tears the setup down after a plan and confirm, with --dry-run to preview; :list finds every opted-in or legacy project on disk" width="760"></p>
+
 Two levels, both per-project:
 
 - **Pause (reversible)** — `/never-stale:off` flips the marker to `enabled:false`, so
