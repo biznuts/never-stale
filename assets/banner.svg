@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 300" width="1280" height="300" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" role="img" aria-label="never-stale — set once, never drifts. A Claude Code plugin that keeps your project rules in front of Claude through every auto-compact.">
   <!-- background -->
   <rect width="1280" height="300" fill="#0d1117"/>
-  <!-- subtle right-edge wash -->
-  <rect x="980" y="0" width="300" height="300" fill="#10161f"/>
 
   <!-- glyph: icon ring + arrow + rule bars (from the logo, no tile) -->
   <g transform="translate(150,-7) scale(0.6)">

@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 300" width="1280" height="300" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK SC', monospace" role="img" aria-label="never-stale —— 一次设定,永不偏移。一个 Claude Code 插件,让项目规则跨越每次自动压缩都保持在 Claude 眼前。">
   <rect width="1280" height="300" fill="#0d1117"/>
-  <rect x="980" y="0" width="300" height="300" fill="#10161f"/>
 
   <g transform="translate(150,-7) scale(0.6)">
     <path d="M 307.3 115 A 150 150 0 1 1 204.7 115" fill="none" stroke="#d97757" stroke-width="34" stroke-linecap="round"/>
