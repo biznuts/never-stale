@@ -126,20 +126,8 @@ type `/never-stale:<verb>`):
 ## How it works (30 seconds)
 
 <p align="center">
-  <img src="assets/demo.png" alt="A Claude Code terminal: after an auto-compact, the [never-stale] reminder re-injects the project rules, so the assistant keeps the language and syncs the docs; a second reminder fires after an edit" width="760">
+  <img src="assets/flow.png" alt="How never-stale works, start to finish: 1 enable the plugin; 2 write your rules in CLAUDE.md; a few hours of work later; 3 an auto-compact happens and your rules would normally be lost; 4 never-stale re-injects your rules; 5 you keep working with nothing forgotten" width="760">
 </p>
-
-> The image above is a hand-drawn illustration. To record a real GIF, see
-> [`docs/recording-a-demo.md`](docs/recording-a-demo.md).
-
-```mermaid
-flowchart LR
-    A[Plugin installed<br/>machine-wide] --> B[Gate runs in<br/>every session]
-    B --> C{Marker found<br/>up to repo root?}
-    C -- no --> D[Exit silently<br/>project untouched]
-    C -- yes + enabled --> E[Inject a reminder<br/>as context]
-    E --> F[after compact: re-confirm rules<br/>after edit: sync the docs]
-```
 
 The plugin ships two hooks **inside itself** — a `SessionStart`/`compact` reminder
 and a `PostToolUse`/`Edit|Write|MultiEdit` doc-sync nudge. Once installed they are
@@ -157,10 +145,26 @@ script into your project:
    `.claude/never-stale.local.json` (gitignored, just this machine). Its presence,
    with `"enabled": true`, is what tells the plugin's hooks to act here.
 
+<p align="center">
+  <img src="assets/demo.png" alt="A Claude Code terminal: after an auto-compact, the [never-stale] reminder re-injects the project rules, so the assistant keeps the language and syncs the docs; a second reminder fires after an edit" width="760">
+</p>
+
+> A hand-drawn illustration of the reminders firing. To record a real GIF, see
+> [`docs/recording-a-demo.md`](docs/recording-a-demo.md).
+
 <details>
 <summary><b>The full mechanism</b> (marker resolution, sentinels, fail-safe)</summary>
 
 <br/>
+
+```mermaid
+flowchart LR
+    A[Plugin installed<br/>machine-wide] --> B[Gate runs in<br/>every session]
+    B --> C{Marker found<br/>up to repo root?}
+    C -- no --> D[Exit silently<br/>project untouched]
+    C -- yes + enabled --> E[Inject a reminder<br/>as context]
+    E --> F[after compact: re-confirm rules<br/>after edit: sync the docs]
+```
 
 **Finding the marker — an upward walk.** `${CLAUDE_PROJECT_DIR}` (and the stdin
 `cwd`) is the directory Claude Code was *launched* from, which is often a
