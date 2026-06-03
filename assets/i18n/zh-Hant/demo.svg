@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 472" width="760" height="472" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK TC', monospace" role="img" aria-label="一個 Claude Code 終端機：自動壓縮之後，never-stale 重新注入專案規則，所以助手維持語言並同步文件。">
+  <defs>
+    <style>
+      .t  { fill:#c9d1d9; font-size:13px; }
+      .dim{ fill:#6e7681; font-size:13px; }
+      .ok { fill:#3fb950; font-size:13px; }
+      .ns { fill:#e0936f; font-size:13px; font-weight:700; }
+      .nstxt { fill:#d6c0b6; font-size:13px; }
+      .cap{ fill:#8b949e; font-size:12px; }
+      .ttl{ fill:#8b949e; font-size:12px; }
+    </style>
+  </defs>
+
+  <!-- window -->
+  <rect x="1" y="1" width="758" height="470" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <!-- title bar -->
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/>
+  <circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/>
+  <circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">claude code — myproject</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- transcript -->
+  <text x="28" y="70" class="dim">› session 進行了兩小時…</text>
+
+  <!-- compact divider -->
+  <text x="28" y="100" class="dim">────────  context 已自動壓縮（對話被摘要）  ────────</text>
+
+  <!-- never-stale box #1 (compact) -->
+  <rect x="24" y="116" width="712" height="60" rx="6" fill="#1c1410" stroke="#5c3a2a" stroke-width="1"/>
+  <rect x="24" y="116" width="4" height="60" rx="2" fill="#d97757"/>
+  <text x="40" y="141" class="ns">[never-stale]<tspan class="nstxt" dx="6">自動壓縮發生 —— 重新確認 CLAUDE.md 仍然適用：</tspan></text>
+  <text x="40" y="162" class="nstxt">口語與寫入語言，以及每次改動後同步相關文件。</text>
+
+  <!-- assistant keeps the rule -->
+  <text x="28" y="206" class="ok">✓ 收到 —— 回覆維持繁體中文（香港）；寫入檔案維持英文。</text>
+
+  <!-- edit event -->
+  <text x="28" y="244" class="dim">✎ 已編輯  <tspan class="t">src/auth.ts</tspan></text>
+
+  <!-- never-stale box #2 (edit) -->
+  <rect x="24" y="260" width="712" height="40" rx="6" fill="#1c1410" stroke="#5c3a2a" stroke-width="1"/>
+  <rect x="24" y="260" width="4" height="40" rx="2" fill="#d97757"/>
+  <text x="40" y="285" class="ns">[never-stale]<tspan class="nstxt" dx="6">有檔案被編輯 —— 看看 README / CLAUDE.md 是否需要同步。</tspan></text>
+
+  <!-- assistant syncs docs -->
+  <text x="28" y="330" class="ok">✓ 已更新 README.md 與 CLAUDE.md 以配合改動。</text>
+
+  <!-- caption strip -->
+  <line x1="24" y1="356" x2="736" y2="356" stroke="#21262d" stroke-width="1"/>
+  <text x="28" y="384" class="cap">壓縮後立刻觸發 · 改動後立刻觸發 · 只在你加入的專案。</text>
+  <text x="28" y="406" class="cap">規則住在你的 <tspan fill="#c9d1d9">CLAUDE.md</tspan>；標記檔是每個專案的開關。</text>
+
+  <!-- footer brand -->
+  <text x="28" y="448" fill="#484f58" font-size="12">never-stale · a Claude Code plugin</text>
+  <text x="732" y="448" text-anchor="end" fill="#484f58" font-size="12">github.com/biznuts/never-stale</text>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" width="760" height="330" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK TC', monospace" role="img" aria-label="在專案中管理 never-stale：off 暫停（可逆）、on 恢復；remove 在計劃與確認後拆除設定，--dry-run 預覽；list 找出磁碟上每一個已加入或舊版專案。">
+  <style>
+    .cmd{fill:#e0936f;font-size:13px;font-weight:700;} .cm{fill:#6e7681;font-size:13px;}
+    .grp{fill:#8b949e;font-size:12px;font-weight:700;letter-spacing:.5px;}
+    .ttl{fill:#8b949e;font-size:12px;}
+  </style>
+
+  <!-- window chrome -->
+  <rect x="1" y="1" width="758" height="328" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">在專案中管理 never-stale</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- PAUSE -->
+  <rect x="28" y="56" width="9" height="9" rx="2" fill="#ffbd2e"/>
+  <text x="44" y="65" class="grp">暫停 · 可逆</text>
+  <text x="28"  y="90"  class="cmd">/never-stale:off</text>
+  <text x="300" y="90"  class="cm"># 暫停 · 閘靜默，什麼都不刪</text>
+  <text x="28"  y="114" class="cmd">/never-stale:on</text>
+  <text x="300" y="114" class="cm"># 恢復 · 同樣語言，閘再次觸發</text>
+
+  <!-- REMOVE -->
+  <rect x="28" y="142" width="9" height="9" rx="2" fill="#f85149"/>
+  <text x="44" y="151" class="grp">移除 · 拆除</text>
+  <text x="28"  y="176" class="cmd">/never-stale:remove</text>
+  <text x="300" y="176" class="cm"># 計劃 → 確認 → 刪除此專案設定</text>
+  <text x="28"  y="200" class="cmd">/never-stale:remove --dry-run</text>
+  <text x="300" y="200" class="cm"># 只預覽 · 不移除任何東西</text>
+
+  <!-- FIND -->
+  <rect x="28" y="228" width="9" height="9" rx="2" fill="#58a6ff"/>
+  <text x="44" y="237" class="grp">尋找</text>
+  <text x="28"  y="262" class="cmd">/never-stale:list</text>
+  <text x="300" y="262" class="cm"># 磁碟上每一個已加入 / 舊版專案</text>
+
+  <!-- footer -->
+  <line x1="24" y1="286" x2="736" y2="286" stroke="#21262d" stroke-width="1"/>
+  <text x="380" y="310" text-anchor="middle" fill="#484f58" font-size="12">全部每個專案層級 · 外掛仍整台機器安裝（/plugin uninstall 從所有地方移除）</text>
+</svg>

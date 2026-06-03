@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 412" width="760" height="412" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK SC', monospace" role="img" aria-label="提交标记文件一次，每位安装插件的队友在改完代码后都会收到文档同步提示。">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3d5573"/>
+    </marker>
+    <style>
+      .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+      .ok{fill:#3fb950;font-size:12px;} .ns{fill:#e0936f;font-size:12px;font-weight:700;}
+      .nstxt{fill:#d6c0b6;font-size:12px;} .ttl{fill:#8b949e;font-size:12px;}
+      .h{fill:#c9d1d9;font-size:13px;font-weight:700;}
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="410" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">一个共享仓库</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <text x="380" y="62" text-anchor="middle" class="dim">提交标记文件一次 —— 加入选项随仓库传递。</text>
+
+  <!-- repo box -->
+  <rect x="230" y="78" width="300" height="56" rx="8" fill="#11161d" stroke="#30363d" stroke-width="1"/>
+  <rect x="230" y="78" width="4" height="56" rx="2" fill="#d97757"/>
+  <text x="380" y="102" text-anchor="middle" class="h">myrepo/.claude/never-stale.json</text>
+  <text x="380" y="122" text-anchor="middle" class="ok">已提交 · "enabled": true</text>
+
+  <!-- arrows to devs -->
+  <text x="392" y="156" class="dim">git pull</text>
+  <path d="M360 136 L150 172" stroke="#3d5573" stroke-width="1.4" fill="none" marker-end="url(#ah)"/>
+  <path d="M380 136 L380 172" stroke="#3d5573" stroke-width="1.4" fill="none" marker-end="url(#ah)"/>
+  <path d="M400 136 L610 172" stroke="#3d5573" stroke-width="1.4" fill="none" marker-end="url(#ah)"/>
+
+  <!-- dev cards -->
+  <g>
+    <rect x="25" y="176" width="210" height="150" rx="8" fill="#0f141a" stroke="#21262d" stroke-width="1"/>
+    <circle cx="44" cy="200" r="6" fill="#58a6ff"/><text x="58" y="204" class="h">Dev A</text>
+    <text x="41" y="232" class="dim">✎ 编辑  src/auth.ts</text>
+    <rect x="39" y="244" width="182" height="34" rx="5" fill="#1c1410" stroke="#5c3a2a"/>
+    <rect x="39" y="244" width="3" height="34" rx="1.5" fill="#d97757"/>
+    <text x="50" y="265" class="ns">[never-stale]<tspan class="nstxt" dx="5">同步文档</tspan></text>
+    <text x="41" y="304" class="ok">✓ README 也更新了</text>
+  </g>
+  <g>
+    <rect x="275" y="176" width="210" height="150" rx="8" fill="#0f141a" stroke="#21262d" stroke-width="1"/>
+    <circle cx="294" cy="200" r="6" fill="#a371f7"/><text x="308" y="204" class="h">Dev B</text>
+    <text x="291" y="232" class="dim">✎ 编辑  api/users.ts</text>
+    <rect x="289" y="244" width="182" height="34" rx="5" fill="#1c1410" stroke="#5c3a2a"/>
+    <rect x="289" y="244" width="3" height="34" rx="1.5" fill="#d97757"/>
+    <text x="300" y="265" class="ns">[never-stale]<tspan class="nstxt" dx="5">同步文档</tspan></text>
+    <text x="291" y="304" class="ok">✓ API 文档已更新</text>
+  </g>
+  <g>
+    <rect x="525" y="176" width="210" height="150" rx="8" fill="#0f141a" stroke="#21262d" stroke-width="1"/>
+    <circle cx="544" cy="200" r="6" fill="#3fb950"/><text x="558" y="204" class="h">Dev C</text>
+    <text x="541" y="232" class="dim">✎ 编辑  cli/main.ts</text>
+    <rect x="539" y="244" width="182" height="34" rx="5" fill="#1c1410" stroke="#5c3a2a"/>
+    <rect x="539" y="244" width="3" height="34" rx="1.5" fill="#d97757"/>
+    <text x="550" y="265" class="ns">[never-stale]<tspan class="nstxt" dx="5">同步文档</tspan></text>
+    <text x="541" y="304" class="ok">✓ 用法文档已更新</text>
+  </g>
+
+  <text x="380" y="358" text-anchor="middle" class="dim">无需逐个开发者设置 —— 每个有插件的人 pull 后都收到同样提示。</text>
+  <text x="28" y="394" fill="#484f58" font-size="12">场景 2 · 团队 · 一个提交的标记文件为整个仓库强制文档同步</text>
+</svg>

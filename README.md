@@ -4,6 +4,14 @@
 
 # never-stale
 
+<p align="center">
+  <strong>English</strong> ·
+  <a href="README.zh-Hant.md">繁體中文</a> ·
+  <a href="README.zh-Hans.md">简体中文</a> ·
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.ko.md">한국어</a>
+</p>
+
 <p align="center"><strong>Set the rules once — they stay in front of Claude all session.</strong><br>
 <em>Keep <code>CLAUDE.md</code> in front of Claude.</em></p>
 
@@ -345,6 +353,11 @@ fire/silent decision). It is off by default and never changes behavior.
 
 Issues and PRs are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). The
 [CHANGELOG](CHANGELOG.md) tracks every release.
+
+This English `README.md` is canonical; the translations
+([繁體中文](README.zh-Hant.md) · [简体中文](README.zh-Hans.md) ·
+[日本語](README.ja.md) · [한국어](README.ko.md)) may lag behind it. Spotted an
+inaccurate translation? A translation PR is very welcome.
 
 ## License
 
