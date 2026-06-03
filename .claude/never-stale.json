@@ -1,7 +1,7 @@
 {
   "$schema": "never-stale/marker@1",
   "enabled": true,
-  "version": "0.6.0",
+  "version": "0.7.0",
   "spoken": "English",
   "written": "English",
   "events": { "compact": true, "edit": true },

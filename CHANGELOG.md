@@ -7,11 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
-## [Unreleased]
-
-_Repository tooling and documentation only — no change to the installed plugin's behavior._
+## [0.7.0] - 2026-06-03
 
 ### Added
+- **Verb subcommands.** `/never-stale` is now driven by verbs instead of one
+  flag-laden command: `/never-stale:setup`, `/never-stale:off`, `/never-stale:on`,
+  `/never-stale:status`, `/never-stale:list`, and `/never-stale:remove`. Each carries
+  its own `description`, so natural-language invocation resolves the right action.
+- **Reversible pause/resume** — `/never-stale:off` flips the marker to
+  `"enabled": false` (silencing the gate) while **keeping** the marker, the recorded
+  languages, and the `CLAUDE.md` block; `/never-stale:on` flips it back. On a committed
+  team marker, `off` offers to drop a *local* `"enabled": false` override instead, so a
+  single checkout can pause without changing the repo.
+- **`/never-stale:status`** — a read-only health check: which marker governs the
+  project (team vs local), its enabled state, the recorded languages and per-event
+  flags, the `CLAUDE.md` fence state (intact / edited since scaffold / missing /
+  malformed), and the one-line "fires vs silent" verdict.
 - Continuous integration (`.github/workflows/ci.yml`): syntax-checks the gate,
   validates every shipped JSON file, confirms the plugin/marketplace entry, and runs
   the full test suite on every push and pull request. The workflow token is pinned to
@@ -26,6 +37,18 @@ _Repository tooling and documentation only — no change to the installed plugin
   `CONTRIBUTING`, `SECURITY`, and issue/PR templates.
 - The repository now **dogfoods** never-stale on itself — a committed marker
   (`.claude/never-stale.json`) plus a sentinel-fenced `CLAUDE.md`.
+
+### Changed
+- The old flags map to verbs: `/never-stale` → `/never-stale:setup`,
+  `/never-stale --off` → `/never-stale:remove` (the destructive teardown),
+  `/never-stale --list` → `/never-stale:list`, `/never-stale --dry-run` →
+  `/never-stale:setup --dry-run` (or `/never-stale:status` to inspect). The marker and
+  `CLAUDE.md` formats are unchanged, and the gate is untouched — `"enabled": false` was
+  already honored — so existing setups keep working without migration.
+
+### Deprecated
+- The bare `/never-stale` command. It now prints a help screen that lists the verbs
+  and maps the old flags; it no longer performs setup or teardown itself.
 
 ## [0.6.0] - 2026-06-02
 
@@ -106,7 +129,7 @@ _Repository tooling and documentation only — no change to the installed plugin
   and a `PostToolUse`/`Edit|Write` doc-sync nudge, a parametrized-language `CLAUDE.md`
   scaffold, and idempotent setup via `/never-stale`.
 
-[Unreleased]: https://github.com/biznuts/never-stale/compare/a3bff08...HEAD
+[0.7.0]: https://github.com/biznuts/never-stale/compare/a3bff08...v0.7.0
 [0.6.0]: https://github.com/biznuts/never-stale/compare/8947de7...a3bff08
 [0.5.0]: https://github.com/biznuts/never-stale/compare/e1a5bf2...8947de7
 [0.4.2]: https://github.com/biznuts/never-stale/compare/0eeb9df...e1a5bf2

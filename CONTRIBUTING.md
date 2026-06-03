@@ -13,7 +13,12 @@ reports, doc fixes, and well-scoped features are all welcome.
 ├── docs/                             # extra docs (e.g. recording a demo)
 └── never-stale/                      # the plugin itself
     ├── .claude-plugin/plugin.json    # name, version, keywords  ← bump version on release
-    ├── commands/never-stale.md       # the /never-stale command (setup / --off / --list)
+    ├── commands/                     # one file per verb subcommand
+    │   ├── setup.md                  # /never-stale:setup   — opt in (scaffold + marker)
+    │   ├── off.md  on.md             # /never-stale:off|on  — reversible pause / resume
+    │   ├── remove.md                 # /never-stale:remove  — full teardown
+    │   ├── list.md  status.md        # /never-stale:list|status — read-only
+    │   └── never-stale.md            # deprecated bare command → prints help
     ├── hooks/hooks.json              # machine-wide hook registration
     ├── hooks/never-stale-gate.js     # the gate: runs everywhere, acts only via a marker
     └── marker.schema.json            # JSON Schema for the opt-in marker
@@ -78,9 +83,11 @@ A firing run prints a `{"hookSpecificOutput":{…}}` JSON line; a silent run pri
 nothing. Set `NEVER_STALE_DEBUG=1` to append a diagnostic line (resolved start dir,
 marker presence, decision) to `never-stale-debug.log` in your OS temp directory.
 
-When you change the `/never-stale` command, verify the round trip end-to-end: run it
-in a scratch project, confirm the marker + sentinel-fenced `CLAUDE.md` are written,
-then `--off` and confirm they are removed cleanly.
+When you change a command, verify the round trip end-to-end in a scratch project:
+`/never-stale:setup` writes the marker + sentinel-fenced `CLAUDE.md`; `/never-stale:off`
+flips the marker to `enabled:false` (and `/never-stale:on` back) without deleting
+anything; `/never-stale:status` reports the state read-only; and `/never-stale:remove`
+removes the marker + fenced block cleanly.
 
 ## Coding conventions
 

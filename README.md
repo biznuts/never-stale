@@ -74,15 +74,26 @@ Installing changes nothing observable on its own. Then, in any project you want 
 in sync:
 
 ```text
-/never-stale
+/never-stale:setup
 ```
 
 It asks your languages, shows a plan of exactly what it will write, and waits for
 your OK. Because the hooks ship inside the plugin, you usually **don't need to
 restart** — the marker arms them for the next session immediately.
 
-Want to look before you leap? `/never-stale --dry-run` prints the plan and writes
-nothing.
+Want to look before you leap? `/never-stale:setup --dry-run` prints the plan and
+writes nothing.
+
+never-stale is driven by **verb subcommands** (plugin commands are namespaced, so you
+type `/never-stale:<verb>`):
+
+| Command | What it does |
+|---|---|
+| `/never-stale:setup` | Opt this project in (scaffold `CLAUDE.md` + write the marker). `--dry-run` previews. |
+| `/never-stale:off` · `/never-stale:on` | **Pause** · **resume** — flip the marker's `enabled`, keeping the marker, languages, and `CLAUDE.md` block. |
+| `/never-stale:status` | Read-only: what governs this project, and whether the gate would fire. |
+| `/never-stale:list` | List every opted-in / legacy project on disk. |
+| `/never-stale:remove` | Full teardown — delete the marker and strip the `CLAUDE.md` block. `--dry-run` previews. |
 
 ## How it works (30 seconds)
 
@@ -101,7 +112,7 @@ registered machine-wide, so the gate script **runs** in every session — but it
 **acts** where you dropped an opt-in **marker**. No marker → it exits silently, so
 projects you never opted into are untouched. Running is not acting.
 
-Running `/never-stale` writes just two project-owned things, and **no** hook or
+Running `/never-stale:setup` writes just two project-owned things, and **no** hook or
 script into your project:
 
 1. **A `CLAUDE.md` rules block** (wrapped in `<!-- never-stale:begin … end -->`
@@ -153,8 +164,8 @@ pitfalls.
 
 ## Team vs local opt-in
 
-`/never-stale` asks whether to opt the project in for the **whole team** or **just
-this machine**:
+`/never-stale:setup` asks whether to opt the project in for the **whole team** or
+**just this machine**:
 
 - **Whole team** → `.claude/never-stale.json` is committed. Anyone with the plugin
   installed gets the reminders in this repo after they pull. (The opt-in travels with
@@ -162,21 +173,28 @@ this machine**:
 - **Just this machine** → `.claude/never-stale.local.json` is gitignored; only your
   checkout is opted in.
 - A **local marker overrides a committed one**, so a teammate who doesn't want the
-  reminders can run `/never-stale --off` (or set `"enabled": false` in a local
-  marker) to veto an inherited team opt-in, without changing the repo.
+  reminders can run `/never-stale:off` (which drops a local marker with
+  `"enabled": false`) to veto an inherited team opt-in, without changing the repo.
 
-## Removing it from a project
+## Pausing or removing it from a project
 
-`/never-stale` and `/never-stale --off` are a toggle. Teardown deletes the marker
-(disarming the gate for new sessions immediately) and removes the sentinel-fenced
-`CLAUDE.md` block — **reliably, even if you edited the text inside the fence**,
-because removal keys off the sentinels, not a byte-for-byte template match. It shows
-a plan and asks first:
+Two levels, both per-project:
+
+- **Pause (reversible)** — `/never-stale:off` flips the marker to `enabled:false`, so
+  the gate goes silent for new sessions, but **nothing is deleted**: the marker, your
+  languages, and the `CLAUDE.md` block all stay. `/never-stale:on` turns it back on
+  with the same languages. On a committed team marker, `off` offers to drop a *local*
+  override instead, so you can pause your own checkout without touching the repo.
+- **Remove (teardown)** — `/never-stale:remove` deletes the marker (disarming the gate
+  for new sessions immediately) and removes the sentinel-fenced `CLAUDE.md` block —
+  **reliably, even if you edited the text inside the fence**, because removal keys off
+  the sentinels, not a byte-for-byte template match. It shows a plan and asks first.
 
 ```text
-/never-stale --off            # plan, confirm, then remove
-/never-stale --off --dry-run  # just show what would be removed
-/never-stale --list           # find every opted-in / legacy project on disk
+/never-stale:off              # pause (reversible); /never-stale:on resumes
+/never-stale:remove           # plan, confirm, then delete the per-project setup
+/never-stale:remove --dry-run # just show what would be removed
+/never-stale:list             # find every opted-in / legacy project on disk
 ```
 
 This is per-project. The plugin itself stays installed machine-wide — remove that
@@ -207,12 +225,12 @@ gradual:
 - Upgrading the plugin alone changes **nothing observable**: a not-yet-migrated 0.5.0
   project has no marker, so the new plugin gate stays silent there, while the old
   project-local hook keeps working exactly as before. **No double reminders.**
-- The next time you run `/never-stale` in such a project, it detects the legacy script
-  + settings hooks, removes them, wraps the existing `CLAUDE.md` sections in a
+- The next time you run `/never-stale:setup` in such a project, it detects the legacy
+  script + settings hooks, removes them, wraps the existing `CLAUDE.md` sections in a
   sentinel fence (keeping your text), and writes a marker. After a restart the project
   runs purely on the plugin-owned, marker-gated hook.
 - Never migrate a project? Its self-contained 0.5.0 setup keeps working. Use
-  `/never-stale --list` to find old installs and `/never-stale --off` to clean them.
+  `/never-stale:list` to find old installs and `/never-stale:remove` to clean them.
 
 </details>
 
@@ -220,10 +238,12 @@ gradual:
 
 - **Install the plugin** → hooks register machine-wide but stay silent everywhere (no
   markers yet).
-- **`/never-stale`** in a project → writes a marker + a `CLAUDE.md` block; the hooks
-  now act there.
-- **`/never-stale --off`** → deletes the marker and the fenced block; the project goes
-  silent again.
+- **`/never-stale:setup`** in a project → writes a marker + a `CLAUDE.md` block; the
+  hooks now act there.
+- **`/never-stale:off`** / **`/never-stale:on`** → pause / resume in place
+  (`enabled:false` / `true`); nothing is deleted.
+- **`/never-stale:remove`** → deletes the marker and the fenced block; the project
+  goes silent again.
 - **`/plugin uninstall never-stale@biznuts`** → removes the plugin's hooks and script
   **machine-wide, atomically**. Every project instantly stops firing, with no
   per-project hook surgery.
@@ -231,7 +251,7 @@ gradual:
 Uninstalling leaves **zero executable code** in any project. What can remain after a
 bare uninstall is inert data — the marker JSON (nothing reads it once the gate is
 gone) and the sentinel-fenced rules in your `CLAUDE.md` (your own project prose). To
-purge that too, run `/never-stale --off` in each project first.
+purge that too, run `/never-stale:remove` in each project first.
 
 ## FAQ
 
@@ -243,14 +263,14 @@ Only two short reminders, and only in opted-in projects: one right after a compa
 and one after a file edit. In projects without a marker the gate emits nothing.
 
 **Will it fight my existing `CLAUDE.md`?**
-`/never-stale` inspects first. If your `CLAUDE.md` already states a language /
+`/never-stale:setup` inspects first. If your `CLAUDE.md` already states a language /
 doc-maintenance / post-compact rule under its own structure, it flags the conflict and
 makes you resolve it before writing — it never blindly appends a duplicate.
 
 **Is uninstall really clean?**
 Yes for executable code: the hooks live in the plugin, so `/plugin uninstall` removes
 them everywhere at once. The only leftovers are inert data (the marker + your own
-`CLAUDE.md` prose), which `/never-stale --off` clears per project.
+`CLAUDE.md` prose), which `/never-stale:remove` clears per project.
 
 **Why not just rely on `CLAUDE.md`?**
 `CLAUDE.md` is reloaded each session, but nothing *prompts* the assistant to act on it

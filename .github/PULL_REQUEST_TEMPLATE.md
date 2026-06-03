@@ -10,8 +10,9 @@ Closes #
 
 - [ ] Ran the gate cases (compact / edit / subdirectory / outside-project / no-marker)
       — fires when expected, silent when expected.
-- [ ] End-to-end: `/never-stale` in a scratch project writes the marker + sentinel-fenced
-      `CLAUDE.md`; `/never-stale --off` removes them cleanly.
+- [ ] End-to-end: `/never-stale:setup` in a scratch project writes the marker +
+      sentinel-fenced `CLAUDE.md`; `/never-stale:off` / `/never-stale:on` pause / resume
+      it; `/never-stale:remove` removes them cleanly.
 - [ ] (If behavior changed) updated `README.md` and `CHANGELOG.md`.
 - [ ] (If releasing) bumped `version` in `never-stale/.claude-plugin/plugin.json`.
 
