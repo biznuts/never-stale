@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 300" width="1280" height="300" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK JP', monospace" role="img" aria-label="never-stale —— 一度決めれば、もう逸れない。プロジェクトのルールを毎回の自動圧縮を越えて Claude の目の前に保つ Claude Code プラグイン。">
+  <rect width="1280" height="300" fill="#0d1117"/>
+  <rect x="980" y="0" width="300" height="300" fill="#10161f"/>
+
+  <g transform="translate(150,-7) scale(0.6)">
+    <path d="M 307.3 115 A 150 150 0 1 1 204.7 115" fill="none" stroke="#d97757" stroke-width="34" stroke-linecap="round"/>
+    <path d="M 232.9 104.8 L 206.6 137.7 L 191.6 96.3 Z" fill="#d97757"/>
+    <rect x="196" y="218" width="120" height="16" rx="8" fill="#e0936f"/>
+    <rect x="196" y="248" width="96"  height="16" rx="8" fill="#8b949e"/>
+    <rect x="196" y="278" width="72"  height="16" rx="8" fill="#6e7681"/>
+  </g>
+
+  <text x="470" y="142" fill="#c9d1d9" font-size="88" font-weight="700">never-stale</text>
+  <text x="473" y="196" fill="#adbac7" font-size="34" font-weight="500">一度決めれば、もう逸れない。</text>
+  <text x="474" y="238" fill="#d97757" font-size="26">Claude Code プラグイン</text>
+</svg>

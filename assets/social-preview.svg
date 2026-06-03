@@ -13,7 +13,7 @@
 
   <!-- wordmark + tagline -->
   <text x="470" y="315" fill="#c9d1d9" font-size="96" font-weight="700">never-stale</text>
-  <text x="472" y="372" fill="#8b949e" font-size="30">Rules that survive every auto-compact.</text>
+  <text x="472" y="372" fill="#adbac7" font-size="34">Set once. Never drifts.</text>
   <text x="472" y="420" fill="#d97757" font-size="28">a Claude Code plugin</text>
   <text x="472" y="470" fill="#484f58" font-size="24">github.com/biznuts/never-stale</text>
 </svg>

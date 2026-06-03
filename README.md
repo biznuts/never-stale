@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.svg" alt="never-stale logo" width="120" height="120">
+  <img src="assets/banner.png" alt="never-stale — set once, never drifts. A Claude Code plugin." width="880">
 </p>
 
 # never-stale

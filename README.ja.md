@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.svg" alt="never-stale logo" width="120" height="120">
+  <img src="assets/i18n/ja/banner.png" alt="never-stale —— 一度決めれば、もう逸れない。Claude Code プラグイン。" width="880">
 </p>
 
 # never-stale
