@@ -44,12 +44,18 @@ Run the automated suite (no dependencies — Node's built-in test runner):
 node --test test/*.test.mjs
 ```
 
-It builds throwaway fixture repos under your temp directory and asserts the gate's
-fire/silent behavior: an enabled marker, the upward walk from a subdirectory, a
-disabled or corrupt marker, an out-of-project edit, the per-event opt-outs, and the
-fail-safe contract (exit 0, nothing on stderr). The same suite runs in CI
-(`.github/workflows/ci.yml`) on every push and pull request, alongside a JSON-validity
-check of every shipped file.
+The suite has two parts:
+
+- **`gate.test.mjs`** builds throwaway fixture repos under your temp directory and
+  asserts the gate's fire/silent behavior: an enabled marker, the upward walk from a
+  subdirectory, a disabled or corrupt marker, an out-of-project edit, the per-event
+  opt-outs, and the fail-safe contract (exit 0, nothing on stderr).
+- **`marker.schema.test.mjs`** checks markers against `marker.schema.json` using a
+  schema-driven (zero-dependency) validator, with valid *and* invalid fixtures, and
+  confirms the repo's own committed marker conforms.
+
+The same suite runs in CI (`.github/workflows/ci.yml`) on every push and pull request,
+alongside a JSON-validity check of every shipped file.
 
 To exercise the gate by hand, it reads its payload on stdin and uses
 `CLAUDE_PROJECT_DIR` (falling back to the stdin `cwd`) as the *start* directory, from

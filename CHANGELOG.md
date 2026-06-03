@@ -14,10 +14,14 @@ _Repository tooling and documentation only — no change to the installed plugin
 ### Added
 - Continuous integration (`.github/workflows/ci.yml`): syntax-checks the gate,
   validates every shipped JSON file, confirms the plugin/marketplace entry, and runs
-  the gate test suite on every push and pull request.
+  the full test suite on every push and pull request. The workflow token is pinned to
+  least privilege (`contents: read`) and the actions run on the Node 24 runtime.
 - A dependency-free gate test suite (`test/gate.test.mjs`) covering fire/silent
   behavior, the upward marker walk, disabled/corrupt markers, out-of-project edits,
   per-event opt-outs, and the fail-safe contract.
+- A marker conformance suite (`test/marker.schema.test.mjs`): a zero-dependency,
+  schema-driven validator exercised with valid *and* invalid fixtures, which also
+  asserts the repo's committed marker conforms to `marker.schema.json`.
 - Community files and a value-first README revamp with demo images: `CHANGELOG`,
   `CONTRIBUTING`, `SECURITY`, and issue/PR templates.
 - The repository now **dogfoods** never-stale on itself — a committed marker
