@@ -52,6 +52,20 @@ opt in.
 
 ## Use cases
 
+Anything you'd write in `CLAUDE.md` and want honored the **whole** session — not just
+until the next auto-compact — is a fit. Rules people keep with it:
+
+- **Language** — reply in 繁體中文 / 日本語 / your language; keep code and docs in English.
+- **Doc-sync** — after changing code, update the `README`, `CHANGELOG`, or design docs.
+- **Writing style** — your project's voice: terse, no emoji, no marketing fluff.
+- **Coding conventions** — naming, formatting, "no new dependencies", a required pattern.
+- **Process rules** — always add a test, update the migration, follow the agreed plan.
+- **Guardrails** — don't edit generated files; use the repo's logger, not `console`.
+
+The assistant honors these at the start of a session, then drifts — especially after a
+compaction. never-stale re-injects them at the two moments that matter. Three worked
+examples:
+
 ### Stay in your language across compactions
 
 <p align="center"><img src="assets/case1-language.png" alt="After an auto-compact, the assistant slips back to English without never-stale, but stays in Traditional Chinese (Hong Kong) with it" width="760"></p>
