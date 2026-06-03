@@ -1,9 +1,10 @@
 # Recording a real demo GIF
 
-The hero image in the README (`assets/demo.png`, rendered from the editable
-`assets/demo.svg` source) is a hand-drawn illustration of the experience. A short
-**real** recording is far more convincing — here is a tight script that shows the
-value in under 20 seconds.
+The README's hero is a before/after still (`assets/hero.png`); the
+`How it works` section also carries `assets/demo.png` (rendered from the editable
+`assets/demo.svg` source), a hand-drawn illustration of the experience. Both are
+stills — a short **real** recording is far more convincing. Here is a tight script
+that shows the value in under 20 seconds.
 
 ## What the clip must show
 

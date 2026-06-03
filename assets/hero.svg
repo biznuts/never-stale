@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 318" width="760" height="318" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" role="img" aria-label="Same session, just after an auto-compact and the same prompt: without never-stale the assistant drifts back to English and leaves the docs out of sync; with never-stale it keeps your language and syncs the docs, because your CLAUDE.md rules are re-injected.">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .red{fill:#f85149;font-size:13px;} .grn{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:12px;} .ttl{fill:#8b949e;font-size:12px;}
+    .hr{fill:#f85149;font-size:14px;font-weight:700;} .hg{fill:#3fb950;font-size:14px;font-weight:700;}
+  </style>
+
+  <!-- window chrome -->
+  <rect x="1" y="1" width="758" height="316" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">same session · just after an auto-compact · you send the same prompt</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- column divider -->
+  <line x1="380" y1="46" x2="380" y2="212" stroke="#21262d" stroke-width="1"/>
+
+  <!-- LEFT: without -->
+  <text x="28" y="68" class="hr">✗  WITHOUT never-stale</text>
+  <text x="28" y="100" class="dim">› update the auth flow + its docs</text>
+  <text x="28" y="128" class="t">“Sure — here’s the change.”</text>
+  <text x="28" y="158" class="red">↳ slipped back to English</text>
+  <text x="28" y="186" class="red">↳ left the docs out of sync</text>
+
+  <!-- RIGHT: with -->
+  <text x="400" y="68" class="hg">✓  WITH never-stale</text>
+  <text x="400" y="100" class="dim">› update the auth flow + its docs</text>
+  <text x="400" y="122" class="acc">[never-stale] your CLAUDE.md rules re-confirmed</text>
+  <text x="400" y="146" class="t">「收到」— updating now.</text>
+  <text x="400" y="174" class="grn">↳ kept 繁體中文（香港）</text>
+  <text x="400" y="202" class="grn">↳ synced README + CLAUDE.md</text>
+
+  <!-- caption -->
+  <line x1="24" y1="232" x2="736" y2="232" stroke="#21262d" stroke-width="1"/>
+  <text x="380" y="258" text-anchor="middle" class="ttl">Your <tspan fill="#c9d1d9">CLAUDE.md</tspan> rules, re-injected the moment the assistant would otherwise drift.</text>
+
+  <!-- footer -->
+  <text x="380" y="294" text-anchor="middle" fill="#484f58" font-size="12">your language · your docs · your conventions — kept through every compaction</text>
+</svg>

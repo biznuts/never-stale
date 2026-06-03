@@ -19,11 +19,21 @@
 [![CI](https://github.com/biznuts/never-stale/actions/workflows/ci.yml/badge.svg)](https://github.com/biznuts/never-stale/actions/workflows/ci.yml)
 
 <p align="center">
-  <img src="assets/demo.png" alt="never-stale re-injects your project's rules right after an auto-compact, so the assistant keeps your language and keeps the docs in sync" width="760">
+  <img src="assets/hero.png" alt="Same session, just after an auto-compact and the same prompt: without never-stale the assistant drifts back to English and leaves the docs out of sync; with never-stale it keeps your language and syncs the docs, because your CLAUDE.md rules are re-injected" width="760">
 </p>
 
-> The image above illustrates the experience. To record your own GIF, see
-> [`docs/recording-a-demo.md`](docs/recording-a-demo.md).
+## Get started in 3 steps
+
+```text
+1  /plugin marketplace add biznuts/never-stale   # add the marketplace
+2  /plugin install never-stale@biznuts           # install the plugin
+3  /never-stale:setup                            # pick your language — that's it
+```
+
+No restart needed — the marker arms the hooks for the next session. **Changed your
+mind?** `/never-stale:remove` cleanly removes it from a project (reversible, and it
+asks first); `/plugin uninstall never-stale@biznuts` removes the plugin everywhere in
+one step.
 
 ## Why you want this
 
@@ -72,13 +82,9 @@ the git repo root.
 
 ## Quickstart
 
-```text
-/plugin marketplace add biznuts/never-stale
-/plugin install never-stale@biznuts
-```
-
-Installing changes nothing observable on its own. Then, in any project you want kept
-in sync:
+You install the plugin in [3 steps](#get-started-in-3-steps) above, and installing it
+changes nothing observable on its own. The action happens **per project** — in any
+repo you want kept in sync, run:
 
 ```text
 /never-stale:setup
@@ -104,6 +110,13 @@ type `/never-stale:<verb>`):
 | `/never-stale:remove` | Full teardown — delete the marker and strip the `CLAUDE.md` block. `--dry-run` previews. |
 
 ## How it works (30 seconds)
+
+<p align="center">
+  <img src="assets/demo.png" alt="A Claude Code terminal: after an auto-compact, the [never-stale] reminder re-injects the project rules, so the assistant keeps the language and syncs the docs; a second reminder fires after an edit" width="760">
+</p>
+
+> The image above is a hand-drawn illustration. To record a real GIF, see
+> [`docs/recording-a-demo.md`](docs/recording-a-demo.md).
 
 ```mermaid
 flowchart LR
