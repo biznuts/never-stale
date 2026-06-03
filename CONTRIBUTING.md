@@ -16,12 +16,13 @@ reports, doc fixes, and well-scoped features are all welcome.
     ├── commands/                     # one file per verb subcommand
     │   ├── setup.md                  # /never-stale:setup   — opt in (scaffold + marker)
     │   ├── off.md  on.md             # /never-stale:off|on  — reversible pause / resume
+    │   ├── update.md                 # /never-stale:update  — reconcile markers after an upgrade
     │   ├── remove.md                 # /never-stale:remove  — full teardown
     │   ├── list.md  status.md        # /never-stale:list|status — read-only
     │   └── never-stale.md            # deprecated bare command → prints help
     ├── hooks/hooks.json              # machine-wide hook registration
     ├── hooks/never-stale-gate.js     # the gate: runs everywhere, acts only via a marker
-    └── marker.schema.json            # JSON Schema for the opt-in marker
+    └── marker.schema.json            # JSON Schema for the opt-in marker (incl. optional spokenCode/writtenCode)
 ```
 
 The single most important invariant: **the gate runs in every session but must only
@@ -86,8 +87,9 @@ marker presence, decision) to `never-stale-debug.log` in your OS temp directory.
 When you change a command, verify the round trip end-to-end in a scratch project:
 `/never-stale:setup` writes the marker + sentinel-fenced `CLAUDE.md`; `/never-stale:off`
 flips the marker to `enabled:false` (and `/never-stale:on` back) without deleting
-anything; `/never-stale:status` reports the state read-only; and `/never-stale:remove`
-removes the marker + fenced block cleanly.
+anything; `/never-stale:status` reports the state read-only; `/never-stale:update`
+reconciles an older marker's version + language codes without changing gate behavior;
+and `/never-stale:remove` removes the marker + fenced block cleanly.
 
 ## Coding conventions
 

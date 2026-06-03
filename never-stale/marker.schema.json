@@ -21,11 +21,19 @@
     },
     "spoken": {
       "type": "string",
-      "description": "Spoken-reply language recorded at scaffold time (informational; the rule itself lives in CLAUDE.md)."
+      "description": "Spoken-reply language recorded at scaffold time (human display string; informational, the rule itself lives in CLAUDE.md)."
+    },
+    "spokenCode": {
+      "type": "string",
+      "description": "Canonical code for the spoken language, for stable comparison across markers (the display string can drift). Known values: \"en\", \"zh-Hant\", \"zh-HK\", \"zh-Hans\"; omit for an \"Other\" language. Informational."
     },
     "written": {
       "type": "string",
-      "description": "Default written-file language recorded at scaffold time (informational)."
+      "description": "Default written-file language recorded at scaffold time (human display string; informational)."
+    },
+    "writtenCode": {
+      "type": "string",
+      "description": "Canonical code for the written-file language. Known values: \"en\", \"zh-Hant\", \"zh-HK\", \"zh-Hans\"; omit for an \"Other\" language. Informational."
     },
     "events": {
       "type": "object",

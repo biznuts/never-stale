@@ -91,8 +91,9 @@ type `/never-stale:<verb>`):
 |---|---|
 | `/never-stale:setup` | Opt this project in (scaffold `CLAUDE.md` + write the marker). `--dry-run` previews. |
 | `/never-stale:off` · `/never-stale:on` | **Pause** · **resume** — flip the marker's `enabled`, keeping the marker, languages, and `CLAUDE.md` block. |
-| `/never-stale:status` | Read-only: what governs this project, and whether the gate would fire. |
+| `/never-stale:status` | Read-only: what governs this project, version drift, and whether the gate would fire. |
 | `/never-stale:list` | List every opted-in / legacy project on disk. |
+| `/never-stale:update` | Reconcile opted-in projects to the installed version (marker version, language codes, fence tag) after a plugin upgrade. Cosmetic; `--dry-run` previews. |
 | `/never-stale:remove` | Full teardown — delete the marker and strip the `CLAUDE.md` block. `--dry-run` previews. |
 
 ## How it works (30 seconds)
@@ -212,6 +213,13 @@ Installed plugins are pinned to the version you installed. To pull a newer relea
 
 Then **restart Claude Code** (or run `/reload-plugins`) so the new command and hooks
 load. To see which version you have, open `/plugin` and find never-stale in the list.
+
+Projects you opted in earlier keep markers (and `CLAUDE.md` fences) stamped with the
+version that wrote them. The gate ignores that stamp, so the drift is purely
+cosmetic — but if you want it tidy, **`/never-stale:update`** sweeps your projects and
+reconciles the recorded version and the language codes in one pass (it never re-asks
+your languages and never changes what the gate does). Pass a parent path to sweep many
+repos at once, e.g. `/never-stale:update ~/projects`.
 
 <details>
 <summary>Upgrading from 0.5.0</summary>

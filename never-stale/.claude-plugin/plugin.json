@@ -1,7 +1,7 @@
 {
   "name": "never-stale",
-  "version": "0.7.0",
-  "description": "Keep your project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Hooks ship in the plugin and are gated per-project by a marker file. Verb subcommands: /never-stale:setup opts a project in, /never-stale:off and /never-stale:on pause and resume it, /never-stale:remove tears it down, and /plugin uninstall removes every hook machine-wide with no per-project surgery.",
+  "version": "0.8.0",
+  "description": "Keep your project's docs, language, and conventions in sync through the whole session — and surviving auto-compact. Hooks ship in the plugin and are gated per-project by a marker file. Verb subcommands: /never-stale:setup opts a project in, /never-stale:off and /never-stale:on pause and resume it, /never-stale:update reconciles markers after an upgrade, /never-stale:remove tears it down, and /plugin uninstall removes every hook machine-wide with no per-project surgery.",
   "author": {
     "name": "biznuts"
   },

@@ -30,11 +30,23 @@ walk).
 
 ## Step 2 — Inspect the artifacts
 
+Read the **installed plugin version** from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`
+(`version`); call it `<PV>`. Use it for the drift checks below. If you cannot resolve
+`${CLAUDE_PLUGIN_ROOT}`, skip the version-drift line rather than guessing.
+
 - **Marker** — read the effective marker. Report: scope (team/local), `enabled`
   (true / false / **invalid** if the JSON is corrupt — the gate treats corrupt as
-  disabled), recorded `spoken` / `written`, per-event flags (`events.compact`,
-  `events.edit`; absent = on), `version`, `createdAt`. If both a team and a local
-  marker exist at `<GOV>`, note that the **local one wins** and show both.
+  disabled), recorded `spoken` / `written` (with `spokenCode` / `writtenCode` if
+  present), per-event flags (`events.compact`, `events.edit`; absent = on), `version`,
+  `createdAt`. If both a team and a local marker exist at `<GOV>`, note that the
+  **local one wins** and show both.
+  - **Version drift** — if `version` !== `<PV>`, note it: "marker written by
+    `<version>`, plugin is `<PV>`." Make clear this is **cosmetic** — the gate ignores
+    the version — and that `/never-stale:update` reconciles it.
+  - **Language codes** — if `spokenCode` / `writtenCode` are missing, or the display
+    string is non-canonical (not one of English / Traditional Chinese / Traditional
+    Chinese (Hong Kong) / Simplified Chinese, nor a deliberate "Other"), note it and
+    point at `/never-stale:update` to normalize. Also informational only.
 - **CLAUDE.md** — at `<GOV>/CLAUDE.md` (and mention `<ROOT>/CLAUDE.md` if different):
   - is there a `<!-- never-stale:begin … -->` / `<!-- never-stale:end -->` fence?
     well-formed, missing, or malformed (unmatched / nested)?
@@ -72,8 +84,9 @@ echo {"cwd":"<ROOT>"} | node "${CLAUDE_PLUGIN_ROOT}/hooks/never-stale-gate.js" c
 ## Step 4 — Report
 
 Summarize (in the user's spoken language): governing marker + scope, enabled state,
-languages, per-event flags, the CLAUDE.md fence state (intact / edited / missing /
-malformed), any legacy residue, and the one-line verdict (fires / silent, and why).
-Point to the next action: `/never-stale:setup` (opt in / reconcile),
-`/never-stale:on` / `/never-stale:off` (resume / pause), or `/never-stale:remove`
-(delete). Write nothing.
+languages (+ codes), per-event flags, version drift vs the installed plugin (and that
+it is cosmetic), the CLAUDE.md fence state (intact / edited / missing / malformed), any
+legacy residue, and the one-line verdict (fires / silent, and why). Point to the next
+action: `/never-stale:setup` (opt in), `/never-stale:on` / `/never-stale:off` (resume /
+pause), `/never-stale:update` (reconcile version + language codes), or
+`/never-stale:remove` (delete). Write nothing.

@@ -1,9 +1,11 @@
 {
   "$schema": "never-stale/marker@1",
   "enabled": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "spoken": "English",
+  "spokenCode": "en",
   "written": "English",
+  "writtenCode": "en",
   "events": { "compact": true, "edit": true },
   "createdAt": "2026-06-02"
 }

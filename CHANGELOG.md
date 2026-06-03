@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
+## [0.8.0] - 2026-06-03
+
+### Added
+- **`/never-stale:update`** — reconcile opted-in projects to the installed plugin
+  version after an upgrade: bumps each marker's recorded `version`, normalizes the
+  recorded languages to canonical display strings, adds language codes, refreshes the
+  `CLAUDE.md` fence `v=` tag (leaving the body and `hash=` untouched), and migrates
+  away legacy v0.5.0 residue. Bookkeeping only — it never re-asks your languages and
+  never changes the gate's behavior (the gate ignores the version and the language
+  strings). Shows a per-project plan and confirms; `--dry-run` previews.
+- **Canonical language codes.** The marker gains optional `spokenCode` / `writtenCode`
+  (`en`, `zh-Hant`, `zh-HK`, `zh-Hans`; omitted for an "Other" language) alongside the
+  human display strings, so a recorded language stays comparable even when the display
+  wording drifts (e.g. "Traditional Chinese (HK)" vs "Traditional Chinese (Hong
+  Kong)"). `setup` writes them; `update` backfills them on older markers.
+- **Version-drift surfacing** in `/never-stale:status` and `/never-stale:list`: each
+  compares a marker's recorded `version` against the installed plugin version and flags
+  a stale marker — making clear it is cosmetic and pointing at `/never-stale:update`.
+
+### Changed
+- `marker.schema.json` adds the optional `spokenCode` / `writtenCode` string properties
+  (documented with the canonical values). Existing markers without them remain valid;
+  no migration is required.
+
 ## [0.7.0] - 2026-06-03
 
 ### Added
@@ -129,6 +153,7 @@ The installed version is the `version` field in
   and a `PostToolUse`/`Edit|Write` doc-sync nudge, a parametrized-language `CLAUDE.md`
   scaffold, and idempotent setup via `/never-stale`.
 
+[0.8.0]: https://github.com/biznuts/never-stale/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/biznuts/never-stale/compare/a3bff08...v0.7.0
 [0.6.0]: https://github.com/biznuts/never-stale/compare/8947de7...a3bff08
 [0.5.0]: https://github.com/biznuts/never-stale/compare/e1a5bf2...8947de7

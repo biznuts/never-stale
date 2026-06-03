@@ -12,7 +12,8 @@ auto-compact.
 
 This is the **setup** verb. Related verbs (each its own command):
 `/never-stale:off` (pause) · `/never-stale:on` (resume) · `/never-stale:remove`
-(full teardown) · `/never-stale:list` · `/never-stale:status`.
+(full teardown) · `/never-stale:list` · `/never-stale:status` · `/never-stale:update`
+(reconcile versions / language codes after a plugin upgrade).
 
 ## How it works (read this before doing anything)
 
@@ -176,7 +177,7 @@ node -e "const fs=require('fs'),c=require('crypto');const b=fs.readFileSync(proc
 Template (the body is everything between the sentinels):
 
 ```markdown
-<!-- never-stale:begin v=0.7.0 hash=<HASH> -->
+<!-- never-stale:begin v=0.8.0 hash=<HASH> -->
 ## Language
 - **Spoken replies** to the user: always **<SPOKEN>**. Keep this unless the user explicitly asks to switch.
 - **Written files** — `CLAUDE.md`, docs, specs, `README`s, code comments, commit messages: **<WRITTEN> by default.**
@@ -215,13 +216,30 @@ reference — the live rule lives in CLAUDE.md):
 {
   "$schema": "never-stale/marker@1",
   "enabled": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "spoken": "<SPOKEN>",
+  "spokenCode": "<SPOKEN_CODE>",
   "written": "<WRITTEN>",
+  "writtenCode": "<WRITTEN_CODE>",
   "events": { "compact": true, "edit": true },
   "createdAt": "<ISO-8601 now, or omit if unknown>"
 }
 ```
+
+`<SPOKEN_CODE>` / `<WRITTEN_CODE>` are the canonical code for the chosen language, so
+the recorded language stays comparable across markers even if the display string is
+worded differently later:
+
+| Chosen language | Code |
+|---|---|
+| English | `en` |
+| Traditional Chinese | `zh-Hant` |
+| Traditional Chinese (Hong Kong) | `zh-HK` |
+| Simplified Chinese | `zh-Hans` |
+
+If the user picked an **Other** language (anything outside the four), keep their text
+in `spoken` / `written` and **omit** the corresponding `…Code` key (do not invent a
+code).
 
 A project can later turn off just one reminder by setting `events.compact` or
 `events.edit` to `false`, or pause the whole project with `/never-stale:off`
@@ -288,5 +306,6 @@ Tell the user (in the chosen spoken language):
   migration removed a still-loaded legacy hook;
 - how to manage it from here: pause with `/never-stale:off` and resume with
   `/never-stale:on` (both keep your languages), inspect with `/never-stale:status`,
+  reconcile versions/language codes after a plugin upgrade with `/never-stale:update`,
   or fully remove with `/never-stale:remove`;
 - that this command touched only this project.

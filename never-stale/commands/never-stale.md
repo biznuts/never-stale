@@ -22,8 +22,9 @@ help; it changes nothing. Run one of the verbs below directly.
 | `/never-stale:setup` | Opt this project in: scaffold the `CLAUDE.md` rules + write the marker. Idempotent. Accepts `--dry-run`. |
 | `/never-stale:off` | **Pause** (reversible): flip the marker to `enabled:false`. Keeps the marker, languages, and `CLAUDE.md` block. |
 | `/never-stale:on` | **Resume**: flip the marker back to `enabled:true`, reusing the recorded languages. |
-| `/never-stale:status` | Read-only health check of this project (marker, enabled state, languages, `CLAUDE.md` fence, would-it-fire). |
+| `/never-stale:status` | Read-only health check of this project (marker, enabled state, languages, version drift, `CLAUDE.md` fence, would-it-fire). |
 | `/never-stale:list` | List every opted-in / legacy project on disk under a search root. Read-only. |
+| `/never-stale:update` | Reconcile opted-in projects to the installed version (marker version, language codes, fence `v=`) after a plugin upgrade. Cosmetic; accepts `--dry-run`. |
 | `/never-stale:remove` | **Full teardown**: delete the marker and strip the `CLAUDE.md` fenced block. Accepts `--dry-run`. |
 
 `off`/`on` are the light switch (nothing is deleted); `remove` is the uninstall
