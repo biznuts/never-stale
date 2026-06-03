@@ -4,6 +4,9 @@
 
 # never-stale
 
+<p align="center"><strong>Set the rules once — they stay in front of Claude all session.</strong><br>
+<em>Keep <code>CLAUDE.md</code> in front of Claude.</em></p>
+
 > Your Claude Code assistant keeps drifting — it forgets to update the docs, forgets
 > which language you wanted, and after an **auto-compact** it loses the rules you set
 > at the top of the session. **never-stale** keeps those rules in front of it the
@@ -247,6 +250,8 @@ gradual:
 </details>
 
 ## Lifecycle
+
+<p align="center"><img src="assets/commands.png" alt="A state machine of the verb subcommands: setup opts a project in (gate fires); off pauses and on resumes (silent while paused); remove tears it down back to no marker; update only reconciles bookkeeping; status and list are read-only" width="760"></p>
 
 - **Install the plugin** → hooks register machine-wide but stay silent everywhere (no
   markers yet).
