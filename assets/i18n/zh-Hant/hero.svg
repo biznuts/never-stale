@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 318" width="760" height="318" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK TC', monospace" role="img" aria-label="同一個 session、剛經歷自動壓縮、送出同一個提示：沒有 never-stale 時助手溜回英文、文件不再同步；有 never-stale 時它維持你的語言並同步文件，因為你的 CLAUDE.md 規則被重新注入。">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .red{fill:#f85149;font-size:13px;} .grn{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:12px;} .ttl{fill:#8b949e;font-size:12px;}
+    .hr{fill:#f85149;font-size:14px;font-weight:700;} .hg{fill:#3fb950;font-size:14px;font-weight:700;}
+  </style>
+
+  <!-- window chrome -->
+  <rect x="1" y="1" width="758" height="316" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">同一個 session · 剛經歷自動壓縮 · 你送出同一個提示</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- column divider -->
+  <line x1="380" y1="46" x2="380" y2="212" stroke="#21262d" stroke-width="1"/>
+
+  <!-- LEFT: without -->
+  <text x="28" y="68" class="hr">✗  沒有 never-stale</text>
+  <text x="28" y="100" class="dim">› 更新 auth 流程與文件</text>
+  <text x="28" y="128" class="t">「好 —— 這就改。」</text>
+  <text x="28" y="158" class="red">↳ 溜回了英文</text>
+  <text x="28" y="186" class="red">↳ 文件不再同步</text>
+
+  <!-- RIGHT: with -->
+  <text x="400" y="68" class="hg">✓  有 never-stale</text>
+  <text x="400" y="100" class="dim">› 更新 auth 流程與文件</text>
+  <text x="400" y="122" class="acc">[never-stale] 你的 CLAUDE.md 規則已重新確認</text>
+  <text x="400" y="146" class="t">「收到」—— 正在更新。</text>
+  <text x="400" y="174" class="grn">↳ 維持繁體中文（香港）</text>
+  <text x="400" y="202" class="grn">↳ 已同步 README + CLAUDE.md</text>
+
+  <!-- caption -->
+  <line x1="24" y1="232" x2="736" y2="232" stroke="#21262d" stroke-width="1"/>
+  <text x="380" y="258" text-anchor="middle" class="ttl">你的 <tspan fill="#c9d1d9">CLAUDE.md</tspan> 規則，在助手快要偏離的那一刻被重新注入。</text>
+
+  <!-- footer -->
+  <text x="380" y="294" text-anchor="middle" fill="#484f58" font-size="12">你的語言 · 你的文件 · 你的慣例 —— 撐過每一次壓縮</text>
+</svg>

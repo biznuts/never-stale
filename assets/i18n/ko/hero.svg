@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 318" width="760" height="318" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK KR', monospace" role="img" aria-label="같은 세션·자동 압축 직후·같은 프롬프트: never-stale 가 없으면 영어로 돌아가고 문서 미동기화; 있으면 CLAUDE.md 규칙이 다시 주입되어 언어를 유지하고 문서를 동기화한다.">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .red{fill:#f85149;font-size:13px;} .grn{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:12px;} .ttl{fill:#8b949e;font-size:12px;}
+    .hr{fill:#f85149;font-size:14px;font-weight:700;} .hg{fill:#3fb950;font-size:14px;font-weight:700;}
+  </style>
+
+  <!-- window chrome -->
+  <rect x="1" y="1" width="758" height="316" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">같은 세션 · 자동 압축 직후 · 같은 프롬프트 전송</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- column divider -->
+  <line x1="380" y1="46" x2="380" y2="212" stroke="#21262d" stroke-width="1"/>
+
+  <!-- LEFT: without -->
+  <text x="28" y="68" class="hr">✗  never-stale 없음</text>
+  <text x="28" y="100" class="dim">› auth 플로우와 문서 업데이트</text>
+  <text x="28" y="128" class="t">「네, 바꿀게요.」</text>
+  <text x="28" y="158" class="red">↳ 영어로 돌아감</text>
+  <text x="28" y="186" class="red">↳ 문서 미동기화</text>
+
+  <!-- RIGHT: with -->
+  <text x="400" y="68" class="hg">✓  never-stale 있음</text>
+  <text x="400" y="100" class="dim">› auth 플로우와 문서 업데이트</text>
+  <text x="400" y="122" class="acc">[never-stale] CLAUDE.md 규칙 재확인</text>
+  <text x="400" y="146" class="t">「알겠습니다」—— 업데이트 중.</text>
+  <text x="400" y="174" class="grn">↳ 번체 중국어(홍콩) 유지</text>
+  <text x="400" y="202" class="grn">↳ README + CLAUDE.md 동기화</text>
+
+  <!-- caption -->
+  <line x1="24" y1="232" x2="736" y2="232" stroke="#21262d" stroke-width="1"/>
+  <text x="380" y="258" text-anchor="middle" class="ttl"><tspan fill="#c9d1d9">CLAUDE.md</tspan> 규칙을, 어시스턴트가 벗어나려는 순간에 다시 주입.</text>
+
+  <!-- footer -->
+  <text x="380" y="294" text-anchor="middle" fill="#484f58" font-size="12">당신의 언어 · 문서 · 규약 —— 모든 압축을 견딤</text>
+</svg>

@@ -59,6 +59,49 @@ npx --yes sharp-cli@latest -i hero.svg -o _r -f png resize 760 318
 mv -f _r/hero.png ./hero.png && rm -rf _r
 ```
 
+## Internationalization (i18n)
+
+The README is offered in five languages. **English `README.md` is canonical**; the
+translations may lag and carry a note saying so, plus a translation-PR invitation.
+
+- **Language codes** match the plugin's own v0.8.0 codes: `zh-Hant` (繁體中文),
+  `zh-Hans` (简体中文), `ja` (日本語), `ko` (한국어).
+- **Translated READMEs** are top-level files: `README.<code>.md`. Every README (English
+  included) carries a language-switcher line near the top linking the other four; the
+  current language is shown bold and unlinked.
+- **Localized images.** Every text-bearing image is localized per language and lives in
+  `assets/i18n/<code>/<name>.png` (with its `.svg` source beside it). The English
+  images stay in `assets/`. A translated README points at `assets/i18n/<code>/…`.
+  - **Localized (8):** `hero`, `flow`, `commands`, `manage`, `demo`, `case1-language`,
+    `case2-team`, `case3-monorepo`.
+  - **Shared / not localized (2):** `icon` (no text) and `social-preview`
+    (GitHub renders one preview per repo — it cannot be per-language, so it stays
+    English).
+- **Translation register.** Translations use standard written form for the broadest
+  readership (e.g. `zh-Hant` is general Traditional Chinese, port/TW-readable), except
+  where a line is *deliberately* in spoken register to make the scenario land (the
+  "kept your language" demo/case lines stay in their colloquial HK form, since the
+  point is showing the assistant talking like the user).
+
+**Rendering localized images.** Same `sharp-cli` flow as the English images, but the
+sources sit under `assets/i18n/<code>/` and the per-image pixel size must match the
+English original (the SVG `viewBox` is unchanged — only the text nodes are translated).
+CJK glyphs (繁中 · 简中 · 日本語 · 한국어, including Hangul) render correctly under
+`sharp`/`resvg` via the system CJK fallback; a `'Noto Sans CJK'` family is added to the
+`font-family` list as a hint but is not required. Per image:
+
+```bash
+cd assets/i18n/zh-Hant
+mkdir _r
+npx --yes sharp-cli@latest -i hero.svg -o _r -f png resize 760 318
+mv -f _r/hero.png ./hero.png && rm -rf _r
+```
+
+Sizes: `hero` 760×318 · `flow` 760×540 · `commands` 760×430 · `manage` 760×330 ·
+`demo` 760×472 · `case1-language`/`case2-team` 760×412 · `case3-monorepo` 760×396.
+Always inspect each render — CJK text is wider than the Latin monospace the layouts were
+tuned for, so a translated line can overflow where the English one fit.
+
 ## Slogans
 
 Chosen, and where each is used:

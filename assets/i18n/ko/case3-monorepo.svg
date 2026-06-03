@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 396" width="760" height="396" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK KR', monospace" role="img" aria-label="monorepo 에서 루트 마커가 전체를 덮고, 게이트는 위로 올라가 가장 가까운 마커를 찾는다; 서브트리는 이를 덮어쓸 수 있다 —— 여기서 jp-app 은 일본어, 나머지는 영어를 유지.">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .dir{fill:#7ee787;font-size:13px;} .ok{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:13px;} .blue{fill:#58a6ff;font-size:13px;}
+    .ttl{fill:#8b949e;font-size:12px;} .h{fill:#c9d1d9;font-size:13px;font-weight:700;}
+  </style>
+  <rect x="1" y="1" width="758" height="394" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">monorepo · 혼합 언어</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- file tree -->
+  <text x="28" y="64" class="dir">myrepo/</text>
+  <text x="28" y="88" class="t">├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← 루트 마커 · written: English</tspan></text>
+  <text x="28" y="112" class="t">├─ <tspan class="dir">packages/</tspan></text>
+  <text x="28" y="136" class="t">│&#160;&#160;├─ <tspan class="dir">web/</tspan><tspan class="dim" dx="6">루트 마커 상속 → English</tspan></text>
+  <text x="28" y="160" class="t">│&#160;&#160;└─ <tspan class="dir">jp-app/</tspan><tspan class="dim" dx="6">일본 시장 담당</tspan></text>
+  <text x="28" y="184" class="t">│&#160;&#160;&#160;&#160;&#160;├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← 덮어씀 · written: </tspan><tspan class="t">日本語</tspan></text>
+  <text x="28" y="208" class="t">│&#160;&#160;&#160;&#160;&#160;└─ <tspan class="dir">src/</tspan><tspan class="blue" dx="6">◀ 여기서 Claude 시작</tspan></text>
+
+  <line x1="24" y1="230" x2="736" y2="230" stroke="#21262d" stroke-width="1"/>
+
+  <!-- resolution -->
+  <text x="28" y="256" class="t"><tspan class="dir">jp-app/src/</tspan> 에서 시작&#160;&#160;<tspan class="blue">위로 ↑</tspan>&#160;&#160;가까운 마커 = jp-app&#160;&#160;→&#160;&#160;<tspan class="t">日本語</tspan></text>
+  <text x="28" y="282" class="t"><tspan class="dir">packages/web/</tspan> 에서 시작&#160;&#160;<tspan class="blue">위로 ↑</tspan>&#160;&#160;가까운 마커 = root&#160;&#160;→&#160;&#160;<tspan class="ok">English</tspan></text>
+  <text x="28" y="308" class="dim">위로 올라가기는 git 저장소 루트에서 멈춤 —— 저장소 밖 마커는 절대 지배하지 않음.</text>
+
+  <text x="28" y="346" class="dim">가장 가까운 조상 우선(.editorconfig 처럼). 루트 마커 하나가 전체를 덮고, 어떤 서브트리든 덮어쓸 수 있음.</text>
+  <text x="28" y="378" fill="#484f58" font-size="12">시나리오 3 · monorepo · 위로 올라가기 + 서브트리별 덮어쓰기</text>
+</svg>

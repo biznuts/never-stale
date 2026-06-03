@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 396" width="760" height="396" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK TC', monospace" role="img" aria-label="在 monorepo 裡，根標記涵蓋全部、閘往上走到最近一個；子樹可覆寫它 —— 這裡 jp-app 用日語，其餘維持英文。">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .dir{fill:#7ee787;font-size:13px;} .ok{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:13px;} .blue{fill:#58a6ff;font-size:13px;}
+    .ttl{fill:#8b949e;font-size:12px;} .h{fill:#c9d1d9;font-size:13px;font-weight:700;}
+  </style>
+  <rect x="1" y="1" width="758" height="394" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">monorepo · 混合語言</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- file tree -->
+  <text x="28" y="64" class="dir">myrepo/</text>
+  <text x="28" y="88" class="t">├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← 根標記檔 · written: English</tspan></text>
+  <text x="28" y="112" class="t">├─ <tspan class="dir">packages/</tspan></text>
+  <text x="28" y="136" class="t">│&#160;&#160;├─ <tspan class="dir">web/</tspan><tspan class="dim" dx="6">繼承根標記檔 → English</tspan></text>
+  <text x="28" y="160" class="t">│&#160;&#160;└─ <tspan class="dir">jp-app/</tspan><tspan class="dim" dx="6">服務日本市場</tspan></text>
+  <text x="28" y="184" class="t">│&#160;&#160;&#160;&#160;&#160;├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← 覆寫 · written: </tspan><tspan class="t">日本語</tspan></text>
+  <text x="28" y="208" class="t">│&#160;&#160;&#160;&#160;&#160;└─ <tspan class="dir">src/</tspan><tspan class="blue" dx="6">◀ 你在這裡啟動 Claude</tspan></text>
+
+  <line x1="24" y1="230" x2="736" y2="230" stroke="#21262d" stroke-width="1"/>
+
+  <!-- resolution -->
+  <text x="28" y="256" class="t">在 <tspan class="dir">jp-app/src/</tspan> 啟動&#160;&#160;<tspan class="blue">往上走 ↑</tspan>&#160;&#160;最近標記檔 = jp-app&#160;&#160;→&#160;&#160;<tspan class="t">日本語</tspan></text>
+  <text x="28" y="282" class="t">在 <tspan class="dir">packages/web/</tspan> 啟動&#160;&#160;<tspan class="blue">往上走 ↑</tspan>&#160;&#160;最近標記檔 = root&#160;&#160;→&#160;&#160;<tspan class="ok">English</tspan></text>
+  <text x="28" y="308" class="dim">往上走止於 git 版本庫根 —— 版本庫外的標記檔永不治理它。</text>
+
+  <text x="28" y="346" class="dim">最近祖先優先（像 .editorconfig）。一個根標記涵蓋全部；任何子樹可覆寫。</text>
+  <text x="28" y="378" fill="#484f58" font-size="12">情境 3 · monorepo · 往上走 + 各子樹覆寫</text>
+</svg>

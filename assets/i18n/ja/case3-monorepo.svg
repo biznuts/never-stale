@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 396" width="760" height="396" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', 'Noto Sans CJK JP', monospace" role="img" aria-label="モノレポでは、ルートのマーカーが全体を覆い、ゲートは最も近いものまで上に辿る；サブツリーが上書きする —— ここでは jp-app が日本語、ほかは英語のまま。">
+  <style>
+    .t{fill:#c9d1d9;font-size:13px;} .dim{fill:#6e7681;font-size:13px;}
+    .dir{fill:#7ee787;font-size:13px;} .ok{fill:#3fb950;font-size:13px;}
+    .acc{fill:#e0936f;font-size:13px;} .blue{fill:#58a6ff;font-size:13px;}
+    .ttl{fill:#8b949e;font-size:12px;} .h{fill:#c9d1d9;font-size:13px;font-weight:700;}
+  </style>
+  <rect x="1" y="1" width="758" height="394" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+  <path d="M1 11 a10 10 0 0 1 10 -10 h738 a10 10 0 0 1 10 10 v25 h-758 z" fill="#161b22"/>
+  <circle cx="22" cy="18.5" r="6" fill="#ff5f56"/><circle cx="42" cy="18.5" r="6" fill="#ffbd2e"/><circle cx="62" cy="18.5" r="6" fill="#27c93f"/>
+  <text x="380" y="23" text-anchor="middle" class="ttl">モノレポ · 言語が混在</text>
+  <line x1="1" y1="37" x2="759" y2="37" stroke="#30363d" stroke-width="1"/>
+
+  <!-- file tree -->
+  <text x="28" y="64" class="dir">myrepo/</text>
+  <text x="28" y="88" class="t">├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← ルートのマーカー · written: English</tspan></text>
+  <text x="28" y="112" class="t">├─ <tspan class="dir">packages/</tspan></text>
+  <text x="28" y="136" class="t">│&#160;&#160;├─ <tspan class="dir">web/</tspan><tspan class="dim" dx="6">ルートのマーカーを継承 → English</tspan></text>
+  <text x="28" y="160" class="t">│&#160;&#160;└─ <tspan class="dir">jp-app/</tspan><tspan class="dim" dx="6">日本市場向け</tspan></text>
+  <text x="28" y="184" class="t">│&#160;&#160;&#160;&#160;&#160;├─ <tspan class="acc">.claude/never-stale.json</tspan><tspan class="dim" dx="6">← 上書き · written: </tspan><tspan class="t">日本語</tspan></text>
+  <text x="28" y="208" class="t">│&#160;&#160;&#160;&#160;&#160;└─ <tspan class="dir">src/</tspan><tspan class="blue" dx="6">◀ ここで Claude を起動</tspan></text>
+
+  <line x1="24" y1="230" x2="736" y2="230" stroke="#21262d" stroke-width="1"/>
+
+  <!-- resolution -->
+  <text x="28" y="256" class="t"><tspan class="dir">jp-app/src/</tspan> で起動&#160;&#160;<tspan class="blue">上に辿る ↑</tspan>&#160;&#160;最も近いマーカー = jp-app&#160;&#160;→&#160;&#160;<tspan class="t">日本語</tspan></text>
+  <text x="28" y="282" class="t"><tspan class="dir">packages/web/</tspan> で起動&#160;&#160;<tspan class="blue">上に辿る ↑</tspan>&#160;&#160;最も近いマーカー = root&#160;&#160;→&#160;&#160;<tspan class="ok">English</tspan></text>
+  <text x="28" y="308" class="dim">探索は git リポジトリのルートで止まる —— リポジトリ外のマーカーは支配しない。</text>
+
+  <text x="28" y="346" class="dim">最も近い祖先が勝つ（.editorconfig 同様）。ルートのマーカーが全体を覆い、サブツリーが上書き。</text>
+  <text x="28" y="378" fill="#484f58" font-size="12">ケース 3 · モノレポ · 上への探索 + サブツリーごとの上書き</text>
+</svg>
