@@ -177,7 +177,7 @@ node -e "const fs=require('fs'),c=require('crypto');const b=fs.readFileSync(proc
 Template (the body is everything between the sentinels):
 
 ```markdown
-<!-- never-stale:begin v=0.8.0 hash=<HASH> -->
+<!-- never-stale:begin v=0.9.0 hash=<HASH> -->
 ## Language
 - **Spoken replies** to the user: always **<SPOKEN>**. Keep this unless the user explicitly asks to switch.
 - **Written files** — `CLAUDE.md`, docs, specs, `README`s, code comments, commit messages: **<WRITTEN> by default.**
@@ -216,7 +216,7 @@ reference — the live rule lives in CLAUDE.md):
 {
   "$schema": "never-stale/marker@1",
   "enabled": true,
-  "version": "0.8.0",
+  "version": "0.9.0",
   "spoken": "<SPOKEN>",
   "spokenCode": "<SPOKEN_CODE>",
   "written": "<WRITTEN>",

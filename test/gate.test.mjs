@@ -23,6 +23,18 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const GATE = path.join(HERE, "..", "never-stale", "hooks", "never-stale-gate.js");
 
+// The exact unconfigured reminder strings the gate emits. Pinned here so a refactor
+// (e.g. the syncPairs drift work) that drops a clause or changes whitespace fails CI
+// instead of staying green — assertFires only matches /\[never-stale\]/, which is not
+// enough to guard byte-identity.
+const COMPACT_MSG =
+  "[never-stale] Auto-compact happened. Re-confirm the rules in CLAUDE.md still apply: " +
+  "the language for spoken replies and for written files, and syncing related docs after every code change. " +
+  "Re-read CLAUDE.md instead of relying on chat memory.";
+const EDIT_MSG =
+  "[never-stale] A file was just edited — check whether related docs " +
+  "(README / CLAUDE.md / design or spec docs) need to be synced.";
+
 let ROOT; // throwaway fixture root
 
 // Build a fixture tree. Each "repo" gets a .git dir so the upward walk is bounded
@@ -35,6 +47,19 @@ function repo(name, marker /* object | null */) {
     fs.writeFileSync(path.join(dir, ".claude", "never-stale.json"), JSON.stringify(marker));
   }
   return dir;
+}
+
+// Write a doc at `rel` inside `dir` with a controllable mtime (epoch ms), so the
+// mtime-based drift check is deterministic. Returns the absolute path.
+function writeDoc(dir, rel, mtimeMs) {
+  const abs = path.join(dir, rel);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, "x\n");
+  if (mtimeMs != null) {
+    const t = mtimeMs / 1000;
+    fs.utimesSync(abs, t, t);
+  }
+  return abs;
 }
 
 before(() => {
@@ -162,4 +187,128 @@ test("per-event opt-out: events.edit=false silences edit only", () => {
 
 test("silent with no start dir at all (no env, no stdin cwd)", () => {
   assertSilent(runGate("compact", {}));
+});
+
+// ---- byte-identity: the unconfigured reminder must be EXACTLY the pinned string ----
+
+test("unconfigured compact reminder is byte-identical to the pinned message", () => {
+  const on = repo("byte-compact", { enabled: true });
+  const r = runGate("compact", { projectDir: on });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("unconfigured edit reminder is byte-identical to the pinned message", () => {
+  const on = repo("byte-edit", { enabled: true });
+  const r = runGate("edit", { projectDir: on, filePath: path.join(on, "src", "x.ts") });
+  assertFires(r, "PostToolUse");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, EDIT_MSG);
+});
+
+// ---- syncPairs drift detection (mtime mode) ----
+
+const PAIR = { source: "CHANGELOG.md", snapshot: "STATE.md", mode: "mtime" };
+
+test("compact: drift note appended when the source is newer than the snapshot", () => {
+  const dir = repo("drift", { enabled: true, syncPairs: [PAIR] });
+  const base = 1_700_000_000_000;
+  writeDoc(dir, "STATE.md", base); // snapshot reconciled earlier
+  writeDoc(dir, "CHANGELOG.md", base + 10_000); // source edited later -> drift
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.ok(ctx.startsWith(COMPACT_MSG), "drift message must still start with the pinned compact reminder");
+  assert.match(ctx, /Possible drift/);
+  assert.match(ctx, /STATE\.md/);
+});
+
+test("compact: NO drift note (byte-identical) when the snapshot is up to date", () => {
+  const dir = repo("clean", { enabled: true, syncPairs: [PAIR] });
+  const base = 1_700_000_000_000;
+  writeDoc(dir, "CHANGELOG.md", base); // source edited earlier
+  writeDoc(dir, "STATE.md", base + 10_000); // snapshot reconciled later -> clean
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact: an unsafe (parent-escaping) pair path is ignored, not drift", () => {
+  const dir = repo("unsafe-pair", { enabled: true, syncPairs: [{ source: "../evil.md", snapshot: "STATE.md", mode: "mtime" }] });
+  writeDoc(dir, "STATE.md", 1_700_000_000_000);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("edit: editing a configured SOURCE retargets the reminder to its snapshot", () => {
+  const dir = repo("target-source", { enabled: true, syncPairs: [PAIR] });
+  const r = runGate("edit", { projectDir: dir, filePath: path.join(dir, "CHANGELOG.md") });
+  assertFires(r, "PostToolUse");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.match(ctx, /STATE\.md/);
+  assert.match(ctx, /tracked source doc/);
+  assert.notEqual(ctx, EDIT_MSG, "a source edit must NOT emit the generic reminder");
+});
+
+test("edit: editing a NON-source file still emits the generic reminder verbatim", () => {
+  const dir = repo("target-other", { enabled: true, syncPairs: [PAIR] });
+  const r = runGate("edit", { projectDir: dir, filePath: path.join(dir, "src", "app.ts") });
+  assertFires(r, "PostToolUse");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, EDIT_MSG);
+});
+
+test("edit: editing the SNAPSHOT also emits the generic reminder (only source retargets)", () => {
+  const dir = repo("target-snapshot", { enabled: true, syncPairs: [PAIR] });
+  const r = runGate("edit", { projectDir: dir, filePath: path.join(dir, "STATE.md") });
+  assertFires(r, "PostToolUse");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, EDIT_MSG);
+});
+
+test("compact: equal mtimes are clean (byte-identical), not drift", () => {
+  const dir = repo("equal-mtime", { enabled: true, syncPairs: [PAIR] });
+  const base = 1_700_000_000_000;
+  writeDoc(dir, "CHANGELOG.md", base);
+  writeDoc(dir, "STATE.md", base); // same mtime -> snapshot is at least as new -> clean
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact: multiple drifted pairs each get their own line", () => {
+  const dir = repo("drift-multi", {
+    enabled: true,
+    syncPairs: [
+      { source: "CHANGELOG.md", snapshot: "STATE.md", mode: "mtime" },
+      { source: "LEDGER.md", snapshot: "SUMMARY.md", mode: "mtime" },
+    ],
+  });
+  const base = 1_700_000_000_000;
+  writeDoc(dir, "STATE.md", base);
+  writeDoc(dir, "SUMMARY.md", base);
+  writeDoc(dir, "CHANGELOG.md", base + 10_000); // both sources newer -> both drift
+  writeDoc(dir, "LEDGER.md", base + 10_000);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.ok(ctx.startsWith(COMPACT_MSG), "must still start with the pinned compact reminder");
+  assert.match(ctx, /STATE\.md/);
+  assert.match(ctx, /SUMMARY\.md/);
+  // the two advisory sentences are on separate lines, not run together with a space
+  assert.match(ctx, /verify before trusting it\.\nSUMMARY\.md/);
+});
+
+test("edit: a source paired with multiple snapshots retargets to all of them", () => {
+  const dir = repo("multi-snapshot", {
+    enabled: true,
+    syncPairs: [
+      { source: "CHANGELOG.md", snapshot: "STATE.md", mode: "mtime" },
+      { source: "CHANGELOG.md", snapshot: "SUMMARY.md", mode: "mtime" },
+    ],
+  });
+  const r = runGate("edit", { projectDir: dir, filePath: path.join(dir, "CHANGELOG.md") });
+  assertFires(r, "PostToolUse");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.match(ctx, /STATE\.md/);
+  assert.match(ctx, /SUMMARY\.md/);
+  assert.match(ctx, /tracked source doc/);
 });

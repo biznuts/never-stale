@@ -311,6 +311,48 @@ bare uninstall is inert data — the marker JSON (nothing reads it once the gate
 gone) and the sentinel-fenced rules in your `CLAUDE.md` (your own project prose). To
 purge that too, run `/never-stale:remove` in each project first.
 
+## Advanced: drift detection (`syncPairs`)
+
+> Optional, opt-in, and off by default. If you do not configure it, never-stale behaves
+> exactly as it always has.
+
+Some projects keep two kinds of doc: a **source** that grows (a changelog / ledger /
+master plan) and a **snapshot** that is supposed to stay reconciled to it (a
+current-state doc). The snapshot silently goes stale relative to the source — and then
+the assistant trusts stale info after a compaction. `syncPairs` makes that drift
+**loud** instead of silent.
+
+Add a `syncPairs` array to your marker (`.claude/never-stale.json`):
+
+```json
+{
+  "$schema": "never-stale/marker@1",
+  "enabled": true,
+  "syncPairs": [
+    { "source": "CHANGELOG.md", "snapshot": "docs/STATE.md", "mode": "mtime" }
+  ]
+}
+```
+
+Paths are **repo-relative** (absolute / drive-qualified / UNC / parent-escaping `..`
+paths are ignored). With a pair configured, the gate:
+
+- **on auto-compact** — appends an advisory note *only when the snapshot has fallen
+  behind*: `STATE.md may be behind CHANGELOG.md … verify before trusting it.` When the
+  snapshot is current, the reminder is unchanged.
+- **on edit** — if you edit a configured **source**, the reminder retargets to "update
+  the paired snapshot." Editing any other file keeps the normal doc-sync nudge.
+
+This release implements **`mode: "mtime"`** only — a pure timestamp comparison (the
+source was edited more recently than the snapshot). It does **no file read and no
+regex**, so there is no slowdown and nothing to misconfigure beyond the two paths. It
+is a **niche power-user feature**, and the signal is **advisory, not authoritative** —
+mtime can be perturbed by a checkout, so it says "possible drift — verify," never
+"this is wrong." It detects a *timestamp* invariant; it cannot judge whether the
+snapshot's prose is semantically correct. Run `/never-stale:status` to preview how each
+pair resolves. The `hash` / `declared` / `version` modes are reserved for a later
+release. See [`docs/drift-detection.md`](docs/drift-detection.md) for the full design.
+
 ## FAQ
 
 **Does it send my code or prompts anywhere?**
