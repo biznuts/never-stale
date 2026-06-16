@@ -44,6 +44,43 @@
         "edit": { "type": "boolean", "default": true }
       }
     },
+    "syncPairs": {
+      "type": "array",
+      "description": "Optional drift-detection pairs (v0.9.0+). Each entry pairs a `source` doc (a ledger/changelog that grows) with a `snapshot` doc that is meant to stay reconciled to it. When a snapshot has fallen behind, the gate appends an advisory drift note on compact and retargets the reminder when you edit the source. Absent or empty => behaviour identical to before. NOTE: the repo's zero-dependency schema test cannot validate array ITEMS — the per-item shape, safe-regex, and path-confinement guards live in test/syncpairs.test.mjs, not here.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "snapshot"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Repo-relative path to the source doc (the ledger). Must NOT be absolute, drive-qualified, UNC, or parent-escaping (..); such a path is silently ignored by the gate."
+          },
+          "snapshot": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Repo-relative path to the snapshot doc that should track the source."
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["mtime", "hash", "declared", "version"],
+            "default": "mtime",
+            "description": "How drift is measured. Only \"mtime\" (the source was edited more recently than the snapshot) is implemented in v0.9.0 — \"hash\"/\"declared\"/\"version\" are reserved for a later release and are treated as a silent no-op for now."
+          },
+          "sourceVersionRe": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Reserved for the \"version\" mode (not yet active): a regex with one capture group extracting the source's current version."
+          },
+          "snapshotSyncedRe": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Reserved for the \"version\" mode (not yet active): a regex with one capture group extracting the version the snapshot declares it is synced to."
+          }
+        }
+      }
+    },
     "createdAt": {
       "type": "string",
       "description": "ISO-8601 timestamp the marker was written (informational)."

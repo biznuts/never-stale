@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
+## [0.9.0] - 2026-06-15
+
+### Added
+- **Optional drift detection (`syncPairs`).** A marker may now pair a *source* doc (a
+  ledger / changelog that grows) with a *snapshot* doc that is meant to stay reconciled
+  to it. When the snapshot falls behind, the gate turns silent drift into a loud,
+  computed signal:
+  - on **compact**, it appends an advisory drift note to the reminder (a read-time
+    signal, so you do not trust a stale snapshot after an auto-compact);
+  - on **edit**, if you edited a configured *source*, the reminder is retargeted to
+    "go update the paired snapshot" instead of the generic nudge.
+  This release implements **`mode: "mtime"`** only — a pure `fs.stat` comparison (the
+  source was edited more recently than the snapshot). It performs **no file read and no
+  regex**, so there is no ReDoS surface and no per-edit content I/O. The `hash`,
+  `declared`, and `version` modes are reserved for a later release and are a silent
+  no-op for now. See [`docs/drift-detection.md`](docs/drift-detection.md) for the design
+  decision and the phased plan.
+- `marker.schema.json` gains the optional, additive top-level `syncPairs` array
+  (typed: `source`, `snapshot`, `mode`, and the reserved regex fields).
+- A dedicated safety suite (`test/syncpairs.test.mjs`) that validates each `syncPairs`
+  entry's shape, rejects unsafe paths (absolute / drive-qualified / UNC / parent-
+  escaping), and statically flags ReDoS-prone regexes — guarding exactly what the
+  array-blind schema validator cannot. New `gate.test.mjs` cases pin the unconfigured
+  reminders byte-for-byte and cover drift/clean and edit-targeting.
+
+### Changed
+- The gate's fail-safe contract is extended with a **bounded-work** rule: the drift
+  checks are stat-only, use no user-supplied regex, and inspect a bounded number of
+  pairs, so the gate can never hang — only ever fall back to the plain reminder. With no
+  `syncPairs` configured, the emitted reminder is **byte-identical** to 0.8.0.
+
 ## [0.8.0] - 2026-06-03
 
 ### Added
@@ -153,6 +184,7 @@ The installed version is the `version` field in
   and a `PostToolUse`/`Edit|Write` doc-sync nudge, a parametrized-language `CLAUDE.md`
   scaffold, and idempotent setup via `/never-stale`.
 
+[0.9.0]: https://github.com/biznuts/never-stale/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/biznuts/never-stale/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/biznuts/never-stale/compare/a3bff08...v0.7.0
 [0.6.0]: https://github.com/biznuts/never-stale/compare/8947de7...a3bff08
