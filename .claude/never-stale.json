@@ -7,5 +7,12 @@
   "written": "English",
   "writtenCode": "en",
   "events": { "compact": true, "edit": true },
+  "syncPairs": [
+    {
+      "source": "never-stale/hooks/never-stale-gate.js",
+      "snapshot": "docs/drift-detection.md",
+      "mode": "hash"
+    }
+  ],
   "createdAt": "2026-06-02"
 }
