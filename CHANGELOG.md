@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
-## [0.9.0] - 2026-06-15
+## [0.9.0] - 2026-06-16
 
 ### Added
 - **Optional drift detection (`syncPairs`).** A marker may now pair a *source* doc (a

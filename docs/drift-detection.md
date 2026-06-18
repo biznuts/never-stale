@@ -6,10 +6,17 @@ sd-app-provisioning workstream), which proposes adding **deterministic drift det
 to the gate so it can *detect* a stale snapshot, not merely *remind*. It records what we
 adopt, what we change, what we defer, and the risks that gate any of it shipping.
 
-It is reference documentation — writing it changes no behavior. No code has shipped from
-this yet. Every claim below was checked against the real shipped code of v0.8.0:
-`never-stale/hooks/never-stale-gate.js`, `never-stale/hooks/hooks.json`,
+It is reference documentation. Every claim below was checked against the real shipped code of
+v0.8.0: `never-stale/hooks/never-stale-gate.js`, `never-stale/hooks/hooks.json`,
 `never-stale/marker.schema.json`, `test/gate.test.mjs`, `test/marker.schema.test.mjs`.
+
+> **Status (updated).** **Phase 1 shipped in v0.9.0** (PR #5) — `syncPairs` with `mode: "mtime"`
+> only, the read-time drift note on compact, edit-side retargeting, the bounded-work contract,
+> the byte-identity test, the dedicated `test/syncpairs.test.mjs` safety suite, and the
+> `/never-stale:status` resolution preview. See [`CHANGELOG.md`](../CHANGELOG.md) and the
+> `## Advanced: drift detection (syncPairs)` section of [`README.md`](../README.md). The rest of
+> this record (Phase 2 onward) remains a forward-looking plan. The verdict and risk analysis below
+> are preserved as written at decision time.
 
 ## Verdict — phase it
 
@@ -153,7 +160,7 @@ What the brief got **wrong or overstated** (each verified):
 
 ## Recommended phased plan
 
-**Phase 1 — ship now (low risk, reuses existing code, identity-preserving):**
+**Phase 1 — ✅ SHIPPED in v0.9.0 (PR #5)** (low risk, reuses existing code, identity-preserving):
 
 - **S1** top-level `syncPairs[]` with a `mode` discriminator (default the cheapest zero-config
   backend, `mtime`; `version` is opt-in only).
