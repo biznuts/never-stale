@@ -187,9 +187,14 @@ What the brief got **wrong or overstated** (each verified):
   synced-to marker; the gate hashes the source's normalized content (a bounded, size-capped,
   compact-only read) and compares. No free-form regex (the synced-to marker is matched with a
   static gate-owned pattern), so the #1 killer risk never materializes; no per-edit read.
-- **Deferred: `version` mode** — the regex write-path validator for richer modes, with all input
-  bounds and path confinement. Keep version-regex opt-in only, and fix `parseVer`'s date/pre-release
-  handling (or reject ambiguous date-shaped input) before it ships at all.
+- **Deferred — not planned: `version` / `declared` modes.** Both remain reserved enum values that
+  the gate treats as a silent no-op; they are **not** in-flight work. `declared` has no spec, and
+  `version` is actively worse than nothing on the common case — a date-shaped ledger reports
+  false-clean (`2026-06-15` and `2026-07-20` both parse as `2026`), which would let the gate call a
+  stale doc fresh and violate the project's honesty stance. There is no cited demand for either, and
+  `mode: "hash"` already covers content staleness. Build only if a concrete use case appears, and
+  only behind the same bounded-work / safe-regex / path-confinement bar as `hash` — fixing
+  `parseVer`'s date/pre-release handling (or rejecting ambiguous date-shaped input) first.
 
 **Defer indefinitely / keep out of the gate entirely:**
 

@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
+## [0.10.1] - 2026-06-18
+
+### Fixed
+- **Removed a ReDoS surface from the documented body-hash one-liner.** The CLAUDE.md
+  fence body-hash snippet in `/never-stale:setup` and `/never-stale:status` stripped
+  trailing whitespace with `/\s+$/` (and trimmed blank lines with `/^\n+|\n+$/g`) —
+  trailing-anchored quantifiers that backtrack catastrophically on a long run that
+  never reaches the anchor (a single line of ~200 KB of spaces measured ~21.6 s).
+  These ran over the user's own CLAUDE.md and contradicted the gate's own normalize,
+  whose comment forbids exactly this pattern. Both one-liners now use the same
+  **linear char-scan** normalization the gate and the `hash`-mode preview already use.
+  The fix is **hash-compatible**: linear and regex forms produce byte-identical hashes
+  for all realistic bodies (verified against the dogfood fence hash), so no recorded
+  fence hash changes and no migration is needed.
+
+### Changed
+- Roadmap honesty: `version` / `declared` syncPairs modes are documented as
+  **deferred and not planned** (reserved no-ops), not in-flight work — `version` would
+  report false-clean on date-shaped ledgers, and there is no cited demand for either;
+  `mode: "hash"` already covers content staleness.
+- New `gate.test.mjs` guard asserts the shipped command one-liners use the linear form
+  and never reintroduce the `/\s+$/` trailing-anchored regex.
+
 ## [0.10.0] - 2026-06-18
 
 ### Added
@@ -214,6 +237,7 @@ The installed version is the `version` field in
   and a `PostToolUse`/`Edit|Write` doc-sync nudge, a parametrized-language `CLAUDE.md`
   scaffold, and idempotent setup via `/never-stale`.
 
+[0.10.1]: https://github.com/biznuts/never-stale/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/biznuts/never-stale/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/biznuts/never-stale/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/biznuts/never-stale/compare/v0.7.0...v0.8.0
