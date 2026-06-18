@@ -93,10 +93,10 @@ Print one block per project, one line per field, e.g.:
 
 ```
 X:/projects/mark-tech1
-  marker version        0.6.0 → 0.9.0
+  marker version        0.6.0 → 0.10.0
   spoken                "Traditional Chinese (HK)" → "Traditional Chinese (Hong Kong)" (zh-HK)
   written               "English" (en)  [add code]
-  CLAUDE.md fence v=     0.6.0 → 0.9.0  (body untouched)
+  CLAUDE.md fence v=     0.6.0 → 0.10.0  (body untouched)
 X:/projects/some-app
   spoken                "Klingon"  [Other — left as-is]
   CLAUDE.md fence        MALFORMED — manual review (begin without end @ line 12)

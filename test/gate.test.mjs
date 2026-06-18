@@ -18,6 +18,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -60,6 +61,38 @@ function writeDoc(dir, rel, mtimeMs) {
     fs.utimesSync(abs, t, t);
   }
   return abs;
+}
+
+// Write exact text at `rel` inside `dir`. Returns the absolute path. Used by the
+// hash-mode cases where the bytes (not the mtime) are what matters.
+function writeText(dir, rel, text) {
+  const abs = path.join(dir, rel);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, text);
+  return abs;
+}
+
+// Mirror of the gate's normalize + SHA-256 (see never-stale-gate.js), so a test can
+// compute the synced-to hash a snapshot should carry to be considered reconciled. Uses
+// the same LINEAR char scans the gate uses (not trailing-anchored regexes), so the
+// value matches exactly.
+function normalizeForHash(text) {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    let e = l.length;
+    while (e > 0 && (l.charCodeAt(e - 1) === 32 || l.charCodeAt(e - 1) === 9)) e--;
+    if (e !== l.length) lines[i] = l.slice(0, e);
+  }
+  const joined = lines.join("\n");
+  let a = 0;
+  let b = joined.length;
+  while (a < b && joined.charCodeAt(a) === 10) a++;
+  while (b > a && joined.charCodeAt(b - 1) === 10) b--;
+  return joined.slice(a, b);
+}
+function syncHash(text, len = 16) {
+  return crypto.createHash("sha256").update(normalizeForHash(text)).digest("hex").slice(0, len);
 }
 
 before(() => {
@@ -311,4 +344,132 @@ test("edit: a source paired with multiple snapshots retargets to all of them", (
   assert.match(ctx, /STATE\.md/);
   assert.match(ctx, /SUMMARY\.md/);
   assert.match(ctx, /tracked source doc/);
+});
+
+// ---- syncPairs drift detection (hash mode) ----
+
+const HASH_PAIR = { source: "CHANGELOG.md", snapshot: "STATE.md", mode: "hash" };
+const SRC_TEXT = "# Changelog\n\n- first\n- second\n";
+
+test("compact (hash): clean when the snapshot's synced-to mark matches the source", () => {
+  const dir = repo("hash-clean", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", SRC_TEXT);
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT)} -->\nup to date\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact (hash): drift when the source content changed since the synced-to mark", () => {
+  const dir = repo("hash-drift", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", SRC_TEXT + "- third\n"); // source moved on
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT)} -->\nstale\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.ok(ctx.startsWith(COMPACT_MSG), "drift message must still start with the pinned compact reminder");
+  assert.match(ctx, /Possible drift/);
+  assert.match(ctx, /STATE\.md/);
+  assert.match(ctx, /synced-to mark/);
+});
+
+test("compact (hash): CRLF and trailing whitespace in the source are not drift", () => {
+  const dir = repo("hash-normalize", { enabled: true, syncPairs: [HASH_PAIR] });
+  // synced-to recorded against the clean text; source differs only cosmetically
+  writeText(dir, "CHANGELOG.md", SRC_TEXT.replace(/\n/g, "  \r\n"));
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT)} -->\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact (hash): a snapshot with no synced-to marker is unknown, not drift", () => {
+  const dir = repo("hash-nomark", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", SRC_TEXT);
+  writeText(dir, "STATE.md", "# State\n\nno synced-to marker here\n");
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact (hash): an oversized source is skipped (unknown), not drift", () => {
+  const dir = repo("hash-oversize", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", "x\n".repeat(300_000)); // > 512 KB cap
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT)} -->\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact (hash): a short synced-to prefix still matches the source", () => {
+  const dir = repo("hash-shortprefix", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", SRC_TEXT);
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT, 8)} -->\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("edit (hash): editing the source still retargets to the snapshot", () => {
+  const dir = repo("hash-edit", { enabled: true, syncPairs: [HASH_PAIR] });
+  const r = runGate("edit", { projectDir: dir, filePath: path.join(dir, "CHANGELOG.md") });
+  assertFires(r, "PostToolUse");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.match(ctx, /STATE\.md/);
+  assert.match(ctx, /synced-to marker/);
+});
+
+test("compact (hash): a full 64-hex synced-to value matches", () => {
+  const dir = repo("hash-64", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", SRC_TEXT);
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT, 64)} -->\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact (hash): an UPPERCASE synced-to value still matches (case-insensitive)", () => {
+  const dir = repo("hash-upper", { enabled: true, syncPairs: [HASH_PAIR] });
+  writeText(dir, "CHANGELOG.md", SRC_TEXT);
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT).toUpperCase()} -->\n`);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  assert.equal(r.json.hookSpecificOutput.additionalContext, COMPACT_MSG);
+});
+
+test("compact (hash): a long single whitespace line is normalized in linear time (no ReDoS)", () => {
+  const dir = repo("hash-redos", { enabled: true, syncPairs: [HASH_PAIR] });
+  // 300 KB single line of spaces + a trailing non-space char: the input that makes a
+  // trailing-anchored `/[ \t]+$/` regex O(n^2). Under the 512 KB cap, so it IS read and
+  // hashed — the gate must still return promptly.
+  writeText(dir, "CHANGELOG.md", " ".repeat(300 * 1024) + "x");
+  writeText(dir, "STATE.md", "# State\n\n<!-- never-stale:synced-to 0000000000000000 -->\n");
+  const t0 = Date.now();
+  const r = runGate("compact", { projectDir: dir });
+  const elapsed = Date.now() - t0;
+  assertFires(r, "SessionStart"); // drift (hash won't match) but must not hang
+  assert.ok(elapsed < 5000, `normalize must be linear; took ${elapsed}ms`);
+});
+
+test("compact: a hash pair and an mtime pair coexist, each judged on its own", () => {
+  const dir = repo("mixed-mode", {
+    enabled: true,
+    syncPairs: [
+      { source: "CHANGELOG.md", snapshot: "STATE.md", mode: "hash" },
+      { source: "LEDGER.md", snapshot: "SUMMARY.md", mode: "mtime" },
+    ],
+  });
+  const base = 1_700_000_000_000;
+  // hash pair: clean (snapshot records the current source hash)
+  writeText(dir, "CHANGELOG.md", SRC_TEXT);
+  writeText(dir, "STATE.md", `# State\n\n<!-- never-stale:synced-to ${syncHash(SRC_TEXT)} -->\n`);
+  // mtime pair: drift (source newer than snapshot)
+  writeDoc(dir, "SUMMARY.md", base);
+  writeDoc(dir, "LEDGER.md", base + 10_000);
+  const r = runGate("compact", { projectDir: dir });
+  assertFires(r, "SessionStart");
+  const ctx = r.json.hookSpecificOutput.additionalContext;
+  assert.match(ctx, /Possible drift/);
+  assert.match(ctx, /SUMMARY\.md/); // mtime pair drifted
+  assert.ok(!ctx.includes("STATE.md"), "the clean hash pair must not appear as drift");
 });

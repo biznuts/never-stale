@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The installed version is the `version` field in
 [`never-stale/.claude-plugin/plugin.json`](never-stale/.claude-plugin/plugin.json).
 
+## [0.10.0] - 2026-06-18
+
+### Added
+- **Content-based drift detection (`mode: "hash"`).** A `syncPairs` entry may now use
+  `"mode": "hash"` for a true content comparison instead of the `mtime` heuristic. The
+  snapshot embeds a **synced-to marker** — an HTML comment naming the source content it
+  was last reconciled to:
+  ```markdown
+  <!-- never-stale:synced-to 8c2b42f56e6fd699 -->
+  ```
+  On compact, the gate hashes the source's normalized content (CRLF, trailing
+  whitespace, and leading/trailing blank lines are normalized away, so cosmetic churn is
+  not drift) and flags a mismatch with the declared marker, reporting the new hash so you
+  can paste it back. A snapshot with no marker, or a source missing / larger than the
+  512 KB cap, is treated as **unknown** (never drift) and surfaced in
+  `/never-stale:status`. The synced-to marker is matched with a **static, gate-owned
+  pattern — no user-supplied regex, so no ReDoS surface** — and the source read is
+  size-capped and happens **only on the low-frequency compact path** (no per-edit I/O).
+  The `declared` and `version` modes remain reserved.
+- `/never-stale:status` previews `hash`-mode pairs (declared vs current hash, with a
+  drift / clean / unknown verdict) alongside the existing `mtime` preview.
+- New `gate.test.mjs` cases cover hash-mode clean / drift / normalization / missing
+  marker / oversized source / short-prefix match / edit retargeting.
+
+### Changed
+- The gate's bounded-work contract now covers `hash` mode: any file read is size-capped
+  (`MAX_HASH_BYTES`) and confined to the compact path, still with no user-supplied regex.
+  With no `syncPairs` configured, the emitted reminder remains **byte-identical** to
+  pre-0.9.0 behaviour.
+
 ## [0.9.0] - 2026-06-16
 
 ### Added
@@ -184,6 +214,7 @@ The installed version is the `version` field in
   and a `PostToolUse`/`Edit|Write` doc-sync nudge, a parametrized-language `CLAUDE.md`
   scaffold, and idempotent setup via `/never-stale`.
 
+[0.10.0]: https://github.com/biznuts/never-stale/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/biznuts/never-stale/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/biznuts/never-stale/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/biznuts/never-stale/compare/a3bff08...v0.7.0
