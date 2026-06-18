@@ -24,10 +24,17 @@
 //   - on compact: appends an advisory drift line to the reminder (read-time signal);
 //   - on edit:    if you edited a configured SOURCE, the reminder is retargeted to
 //                 "go update the paired snapshot" instead of the generic nudge.
-// Phase 1 implements ONLY mode:"mtime" — a pure fs.stat comparison (no file READ, no
-// regex), so there is no ReDoS surface and no per-edit content I/O. Other modes are
-// reserved for a later release and are a silent no-op here. With no `syncPairs`, the
-// emitted reminder is byte-identical to the pre-0.9.0 behaviour.
+// Two modes are implemented:
+//   - "mtime" (default): a pure fs.stat comparison — source edited more recently than
+//     the snapshot. No file READ, no regex.
+//   - "hash": content drift. The snapshot embeds a synced-to marker
+//     (`<!-- never-stale:synced-to <hex> -->`) declaring which source content it was
+//     last reconciled to; the gate hashes the source's normalized content (a bounded,
+//     compact-only read) and flags a mismatch. The synced-to marker is matched with a
+//     STATIC gate-owned pattern — no user-supplied regex, so no ReDoS surface, and no
+//     per-edit content I/O (reads happen only on the low-frequency compact path).
+// The "declared" and "version" modes remain reserved and a silent no-op here. With no
+// `syncPairs`, the emitted reminder is byte-identical to the pre-0.9.0 behaviour.
 //
 // Usage: node never-stale-gate.js <compact|edit>   (hook payload arrives on stdin)
 //
@@ -38,12 +45,13 @@
 // Contract: NEVER throw, NEVER exit non-zero, NEVER write to stderr. On any doubt,
 // exit 0 with empty stdout (a silent no-op). Failing safe means "no reminder" —
 // never "fire in a project the user did not opt into". The drift checks also honor a
-// BOUNDED-WORK rule: a bounded pair count, stat-only (no whole-file reads), and no
-// user-supplied regex — so the gate can never hang, only ever fall back to the plain
-// reminder.
+// BOUNDED-WORK rule: a bounded pair count (MAX_PAIRS), no user-supplied regex, and any
+// file read is size-capped (MAX_HASH_BYTES) and happens only on the low-frequency
+// compact path — so the gate can never hang, only ever fall back to the plain reminder.
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const messages = {
   compact:
@@ -58,6 +66,18 @@ const messages = {
 // Upper bound on how many sync pairs we will ever inspect in one invocation
 // (bounded-work contract — a runaway pair list can never make the gate slow).
 const MAX_PAIRS = 50;
+
+// Upper bound on the size of a doc the gate will read+hash in `hash` mode. A doc
+// larger than this is skipped (treated as "unknown", surfaced in /never-stale:status),
+// so the read-time hash work stays bounded even with an adversarial marker. Reads only
+// ever happen on the low-frequency compact path, never per-edit.
+const MAX_HASH_BYTES = 512 * 1024;
+
+// The synced-to marker a snapshot embeds to declare which source content it was last
+// reconciled to, e.g. `<!-- never-stale:synced-to 8c2b42f56e6fd699 -->`. STATIC and
+// gate-owned (never a user-supplied pattern), so there is no ReDoS surface — the hex
+// class is bounded and the pattern is linear.
+const SYNCED_TO_RE = /never-stale:synced-to\s+([0-9a-fA-F]{8,64})/;
 
 function readJsonSafe(file) {
   try {
@@ -119,9 +139,71 @@ function mtimeMs(file) {
   }
 }
 
+// Normalize text so cosmetic churn (CRLF vs LF, trailing space/tab, leading/trailing
+// blank lines) does not register as content drift. Implemented with LINEAR char scans,
+// NOT trailing-anchored regexes: `/[ \t]+$/` (and `/\n+$/`) are O(n^2) on a long run of
+// the class that does not reach the anchor — and this runs over user-controlled source
+// content on the compact path, so a regex here would reintroduce the exact ReDoS/hang
+// the bounded-work contract forbids. The only regex is the fixed-string CRLF collapse
+// (no quantifier → linear). Produces the same value as a per-line trailing-trim would
+// for normal docs, so the hash stays reproducible from the documented one-liner.
+function normalize(text) {
+  const lf = text.replace(/\r\n/g, "\n");
+  const lines = lf.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    let e = l.length;
+    while (e > 0) {
+      const c = l.charCodeAt(e - 1);
+      if (c === 32 || c === 9) e--; // trailing space or tab
+      else break;
+    }
+    if (e !== l.length) lines[i] = l.slice(0, e);
+  }
+  const joined = lines.join("\n");
+  let a = 0;
+  let b = joined.length;
+  while (a < b && joined.charCodeAt(a) === 10) a++; // leading blank lines
+  while (b > a && joined.charCodeAt(b - 1) === 10) b--; // trailing blank lines
+  return joined.slice(a, b);
+}
+
+// Read a doc as UTF-8, but only if it is a regular file within the size cap. Returns
+// null (skip) for anything missing, oversized, or unreadable — bounded-work + fail-safe.
+function readBounded(file) {
+  try {
+    const st = fs.statSync(file);
+    if (!st.isFile() || st.size > MAX_HASH_BYTES) return null;
+    return fs.readFileSync(file, "utf8");
+  } catch {
+    return null;
+  }
+}
+
+// Full SHA-256 hex of a doc's normalized content, or null if it cannot be read/hashed.
+function contentHash(file) {
+  const raw = readBounded(file);
+  if (raw === null) return null;
+  try {
+    return crypto.createHash("sha256").update(normalize(raw)).digest("hex");
+  } catch {
+    return null;
+  }
+}
+
+// The synced-to hash a snapshot declares (lowercased), or null when the snapshot
+// carries no synced-to marker (unknown — surfaced in /never-stale:status, never "drift").
+function declaredSyncHash(file) {
+  const raw = readBounded(file);
+  if (raw === null) return null;
+  const m = SYNCED_TO_RE.exec(raw);
+  return m ? m[1].toLowerCase() : null;
+}
+
 // Compute drift notes for the marker's syncPairs. Returns a (possibly empty) array of
-// human-readable strings. Phase 1: mtime mode only (stat-only, no read, no regex).
-// Fail-safe and bounded: a bad/escaping/unimplemented pair is skipped, never thrown.
+// human-readable strings. Supports mode "mtime" (stat-only) and "hash" (bounded read +
+// synced-to marker compare, no user regex). Fail-safe and bounded: a bad/escaping/
+// oversized/unimplemented pair is skipped, never thrown.
 function checkPairs(root, pairs) {
   const out = [];
   if (!Array.isArray(pairs) || !pairs.length) return out;
@@ -129,18 +211,34 @@ function checkPairs(root, pairs) {
     try {
       if (!p || typeof p !== "object") continue;
       const mode = typeof p.mode === "string" ? p.mode : "mtime";
-      if (mode !== "mtime") continue; // only mtime is implemented in this release
       const src = resolveInside(root, p.source);
       const snap = resolveInside(root, p.snapshot);
       if (!src || !snap) continue;
-      const sm = mtimeMs(src);
-      const pm = mtimeMs(snap);
-      if (sm === null || pm === null) continue;
-      if (sm > pm) {
-        out.push(
-          `${p.snapshot} may be behind ${p.source} (the source was edited more recently); verify before trusting it.`,
-        );
+      if (mode === "mtime") {
+        const sm = mtimeMs(src);
+        const pm = mtimeMs(snap);
+        if (sm === null || pm === null) continue;
+        if (sm > pm) {
+          out.push(
+            `${p.snapshot} may be behind ${p.source} (the source was edited more recently); verify before trusting it.`,
+          );
+        }
+      } else if (mode === "hash") {
+        // Content drift: the snapshot declares which source content it last reconciled
+        // to (a synced-to marker); compare it to the source's current normalized hash.
+        const declared = declaredSyncHash(snap);
+        if (!declared) continue; // no marker -> unknown, not drift (surfaced in /status)
+        const current = contentHash(src);
+        if (current === null) continue; // unreadable/oversized -> unknown
+        if (!current.startsWith(declared)) {
+          out.push(
+            `${p.snapshot} may be behind ${p.source} (source content changed since the ` +
+              `snapshot's synced-to mark ${declared}; it is now ${current.slice(0, declared.length)}) — ` +
+              `reconcile and update the synced-to marker.`,
+          );
+        }
       }
+      // other modes (declared, version) are reserved and a silent no-op for now
     } catch {
       /* per-pair isolation — one bad pair never blocks the rest */
     }

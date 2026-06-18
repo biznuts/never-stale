@@ -14,9 +14,16 @@ v0.8.0: `never-stale/hooks/never-stale-gate.js`, `never-stale/hooks/hooks.json`,
 > only, the read-time drift note on compact, edit-side retargeting, the bounded-work contract,
 > the byte-identity test, the dedicated `test/syncpairs.test.mjs` safety suite, and the
 > `/never-stale:status` resolution preview. See [`CHANGELOG.md`](../CHANGELOG.md) and the
-> `## Advanced: drift detection (syncPairs)` section of [`README.md`](../README.md). The rest of
-> this record (Phase 2 onward) remains a forward-looking plan. The verdict and risk analysis below
-> are preserved as written at decision time.
+> `## Advanced: drift detection (syncPairs)` section of [`README.md`](../README.md).
+>
+> **Phase 2's first increment shipped in v0.10.0** — `mode: "hash"`, a content-based check.
+> Rather than the brief's version-regex (the #1 killer risk below), it reuses the snapshot as the
+> store: the snapshot embeds a synced-to marker `<!-- never-stale:synced-to <hex> -->` and the gate
+> hashes the source's normalized content (a bounded, compact-only read) to detect real content
+> drift. This keeps the **zero free-form-regex / zero-ReDoS** property of Phase 1 while removing
+> mtime's false signals. The regex-based `version` mode (and `declared`) remain **deferred** — if
+> they ship they need the `parseVer` date/pre-release fix and the safe-regex + input-cap mitigations
+> below. The verdict and risk analysis below are preserved as written at decision time.
 
 ## Verdict — phase it
 
@@ -175,9 +182,14 @@ What the brief got **wrong or overstated** (each verified):
 
 **Phase 2 — guarded, behind config, after Phase 1 proves the model:**
 
-- The write-path validator for richer modes, with all input bounds and path confinement. Keep
-  version-regex opt-in only, and fix `parseVer`'s date/pre-release handling (or reject
-  ambiguous date-shaped input) before it ships at all.
+- ✅ **SHIPPED in v0.10.0: `mode: "hash"`** — a content-based check that sidesteps the
+  version-regex risk entirely. The snapshot declares the source content it reconciled to via a
+  synced-to marker; the gate hashes the source's normalized content (a bounded, size-capped,
+  compact-only read) and compares. No free-form regex (the synced-to marker is matched with a
+  static gate-owned pattern), so the #1 killer risk never materializes; no per-edit read.
+- **Deferred: `version` mode** — the regex write-path validator for richer modes, with all input
+  bounds and path confinement. Keep version-regex opt-in only, and fix `parseVer`'s date/pre-release
+  handling (or reject ambiguous date-shaped input) before it ships at all.
 
 **Defer indefinitely / keep out of the gate entirely:**
 

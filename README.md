@@ -343,15 +343,35 @@ paths are ignored). With a pair configured, the gate:
 - **on edit** — if you edit a configured **source**, the reminder retargets to "update
   the paired snapshot." Editing any other file keeps the normal doc-sync nudge.
 
-This release implements **`mode: "mtime"`** only — a pure timestamp comparison (the
-source was edited more recently than the snapshot). It does **no file read and no
-regex**, so there is no slowdown and nothing to misconfigure beyond the two paths. It
-is a **niche power-user feature**, and the signal is **advisory, not authoritative** —
-mtime can be perturbed by a checkout, so it says "possible drift — verify," never
-"this is wrong." It detects a *timestamp* invariant; it cannot judge whether the
-snapshot's prose is semantically correct. Run `/never-stale:status` to preview how each
-pair resolves. The `hash` / `declared` / `version` modes are reserved for a later
-release. See [`docs/drift-detection.md`](docs/drift-detection.md) for the full design.
+Two `mode`s are available:
+
+- **`mtime`** (default) — a pure timestamp comparison: the source was edited more
+  recently than the snapshot. Zero-config and zero-cost (no file read, no regex), but a
+  *heuristic* — a checkout or a `touch` can perturb the timestamp, so it can over- or
+  under-report.
+- **`hash`** — a content comparison. The snapshot embeds a **synced-to marker** naming
+  the source content it was last reconciled to, and the gate hashes the source to check
+  it has not moved since. More robust than `mtime` (cosmetic churn — CRLF, trailing
+  whitespace — is normalized away, so it does not register as drift), still with **no
+  user-supplied regex and no ReDoS surface**; the source read is size-capped and happens
+  only on the low-frequency compact path.
+
+To use `hash` mode, set `"mode": "hash"` on the pair and drop a synced-to marker into the
+snapshot (an HTML comment, invisible when rendered):
+
+```markdown
+<!-- never-stale:synced-to 8c2b42f56e6fd699 -->
+```
+
+When the source moves on, the compact note tells you the new hash so you can paste it
+back in; `/never-stale:status` previews the expected hash for each pair at any time. (No
+marker yet? The gate treats the pair as *unknown*, never as drift.)
+
+It is a **niche power-user feature**, and the signal is **advisory, not authoritative**
+("possible drift — verify," never "this is wrong"): it detects a *version/sync-marker*
+invariant and cannot judge whether the snapshot's prose is semantically correct. The
+`declared` / `version` modes are reserved for a later release. See
+[`docs/drift-detection.md`](docs/drift-detection.md) for the full design.
 
 ## FAQ
 

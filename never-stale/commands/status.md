@@ -54,15 +54,29 @@ Read the **installed plugin version** from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin
     - resolve both paths relative to `<GOV>`; flag any that is **unsafe** (absolute /
       drive-qualified / UNC / parent-escaping `..`) or **missing on disk** — the gate
       silently skips those;
-    - for `mode: "mtime"` (the default and the only mode implemented in v0.9.0), read
-      both files' mtimes and state the verdict: **drift** (source newer than snapshot →
-      "snapshot may be behind, verify") or **clean** (snapshot at least as new);
-    - for `mode` of `hash` / `declared` / `version`, note it is **reserved / not yet
-      active** — the gate treats it as a no-op for now.
+    - for `mode: "mtime"` (the default), read both files' mtimes and state the verdict:
+      **drift** (source newer than snapshot → "snapshot may be behind, verify") or
+      **clean** (snapshot at least as new);
+    - for `mode: "hash"` (v0.10.0+), read the snapshot's synced-to marker
+      (`<!-- never-stale:synced-to <hex> -->`) and the source's current normalized hash,
+      then state the verdict: **drift** (the marker is not a prefix of the current source
+      hash → "snapshot recorded `<declared>`, source is now `<current>`; reconcile and
+      update the marker"), **clean** (they match), or **unknown** (no synced-to marker in
+      the snapshot, or the source is missing / larger than the 512 KB cap — the gate
+      skips these silently, so surfacing them here is the whole point);
+    - for `mode` of `declared` / `version`, note it is **reserved / not yet active** —
+      the gate treats it as a no-op for now.
 
-    Mtime mtimes (epoch seconds) for the verdict:
+    Mtimes (epoch seconds) for an `mtime`-mode verdict:
     ```
     node -e "const fs=require('fs');for(const f of process.argv.slice(1)){try{process.stdout.write(f+' '+Math.round(fs.statSync(f).mtimeMs/1000)+'\n')}catch{process.stdout.write(f+' MISSING\n')}}" "<GOV>/<source>" "<GOV>/<snapshot>"
+    ```
+
+    Hashes for a `hash`-mode verdict — the source's current normalized hash and the
+    snapshot's declared synced-to marker (compare: the declared value should be a prefix
+    of the source hash):
+    ```
+    node -e "const fs=require('fs'),c=require('crypto');const tr=s=>{let e=s.length;while(e>0&&(s.charCodeAt(e-1)===32||s.charCodeAt(e-1)===9))e--;return s.slice(0,e)};const n=t=>{const L=t.replace(/\r\n/g,'\n').split('\n').map(tr).join('\n');let a=0,b=L.length;while(a<b&&L.charCodeAt(a)===10)a++;while(b>a&&L.charCodeAt(b-1)===10)b--;return L.slice(a,b)};const src=process.argv[1],snap=process.argv[2];try{process.stdout.write('source '+c.createHash('sha256').update(n(fs.readFileSync(src,'utf8'))).digest('hex').slice(0,16)+'\n')}catch{process.stdout.write('source MISSING\n')}try{const m=/never-stale:synced-to\s+([0-9a-fA-F]{8,64})/.exec(fs.readFileSync(snap,'utf8'));process.stdout.write('snapshot synced-to '+(m?m[1]:'(no marker)')+'\n')}catch{process.stdout.write('snapshot MISSING\n')}" "<GOV>/<source>" "<GOV>/<snapshot>"
     ```
 - **CLAUDE.md** — at `<GOV>/CLAUDE.md` (and mention `<ROOT>/CLAUDE.md` if different):
   - is there a `<!-- never-stale:begin … -->` / `<!-- never-stale:end -->` fence?

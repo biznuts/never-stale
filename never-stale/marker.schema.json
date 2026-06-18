@@ -66,7 +66,7 @@
             "type": "string",
             "enum": ["mtime", "hash", "declared", "version"],
             "default": "mtime",
-            "description": "How drift is measured. Only \"mtime\" (the source was edited more recently than the snapshot) is implemented in v0.9.0 — \"hash\"/\"declared\"/\"version\" are reserved for a later release and are treated as a silent no-op for now."
+            "description": "How drift is measured. \"mtime\" (default, v0.9.0+): the source was edited more recently than the snapshot — a heuristic, no file read. \"hash\" (v0.10.0+): the snapshot embeds a synced-to marker `<!-- never-stale:synced-to <hex> -->` declaring the source content it last reconciled to; the gate hashes the source's normalized content (a bounded, compact-only read, no user regex) and flags a mismatch. \"declared\"/\"version\" are reserved for a later release and are treated as a silent no-op for now."
           },
           "sourceVersionRe": {
             "type": "string",
