@@ -87,7 +87,7 @@ Read the **installed plugin version** from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin
     intact) or **edited since scaffold**. Hash one-liner:
 
     ```
-    node -e "const fs=require('fs'),c=require('crypto');const b=fs.readFileSync(process.argv[1],'utf8').replace(/\r\n/g,'\n').split('\n').map(l=>l.replace(/\s+$/,'')).join('\n').replace(/^\n+|\n+$/g,'');process.stdout.write(c.createHash('sha256').update(b).digest('hex').slice(0,16))" <bodyfile>
+    node -e "const fs=require('fs'),c=require('crypto');const tr=s=>{let e=s.length;while(e>0&&(s.charCodeAt(e-1)===32||s.charCodeAt(e-1)===9))e--;return s.slice(0,e)};const n=t=>{const L=t.replace(/\r\n/g,'\n').split('\n').map(tr).join('\n');let a=0,b=L.length;while(a<b&&L.charCodeAt(a)===10)a++;while(b>a&&L.charCodeAt(b-1)===10)b--;return L.slice(a,b)};process.stdout.write(c.createHash('sha256').update(n(fs.readFileSync(process.argv[1],'utf8'))).digest('hex').slice(0,16))" <bodyfile>
     ```
 - **Legacy residue** — note any `<ROOT>/.claude/hooks/never-stale-reminder.js` or a
   `settings.json`/`settings.local.json` hook whose `command` contains

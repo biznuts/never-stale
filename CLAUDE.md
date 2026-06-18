@@ -1,6 +1,6 @@
 # Project rules
 
-<!-- never-stale:begin v=0.10.0 hash=8c2b42f56e6fd699 -->
+<!-- never-stale:begin v=0.10.1 hash=8c2b42f56e6fd699 -->
 ## Language
 - **Spoken replies** to the user: always **English**. Keep this unless the user explicitly asks to switch.
 - **Written files** — `CLAUDE.md`, docs, specs, `README`s, code comments, commit messages: **English by default.**

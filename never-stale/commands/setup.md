@@ -171,13 +171,13 @@ removed). If you cannot compute a hash, write `hash=unset` — teardown still wo
 A one-liner to compute the hash from a file holding the body:
 
 ```
-node -e "const fs=require('fs'),c=require('crypto');const b=fs.readFileSync(process.argv[1],'utf8').replace(/\r\n/g,'\n').split('\n').map(l=>l.replace(/\s+$/,'')).join('\n').replace(/^\n+|\n+$/g,'');process.stdout.write(c.createHash('sha256').update(b).digest('hex').slice(0,16))" <bodyfile>
+node -e "const fs=require('fs'),c=require('crypto');const tr=s=>{let e=s.length;while(e>0&&(s.charCodeAt(e-1)===32||s.charCodeAt(e-1)===9))e--;return s.slice(0,e)};const n=t=>{const L=t.replace(/\r\n/g,'\n').split('\n').map(tr).join('\n');let a=0,b=L.length;while(a<b&&L.charCodeAt(a)===10)a++;while(b>a&&L.charCodeAt(b-1)===10)b--;return L.slice(a,b)};process.stdout.write(c.createHash('sha256').update(n(fs.readFileSync(process.argv[1],'utf8'))).digest('hex').slice(0,16))" <bodyfile>
 ```
 
 Template (the body is everything between the sentinels):
 
 ```markdown
-<!-- never-stale:begin v=0.10.0 hash=<HASH> -->
+<!-- never-stale:begin v=0.10.1 hash=<HASH> -->
 ## Language
 - **Spoken replies** to the user: always **<SPOKEN>**. Keep this unless the user explicitly asks to switch.
 - **Written files** — `CLAUDE.md`, docs, specs, `README`s, code comments, commit messages: **<WRITTEN> by default.**
@@ -216,7 +216,7 @@ reference — the live rule lives in CLAUDE.md):
 {
   "$schema": "never-stale/marker@1",
   "enabled": true,
-  "version": "0.10.0",
+  "version": "0.10.1",
   "spoken": "<SPOKEN>",
   "spokenCode": "<SPOKEN_CODE>",
   "written": "<WRITTEN>",

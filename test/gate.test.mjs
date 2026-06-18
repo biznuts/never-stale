@@ -473,3 +473,52 @@ test("compact: a hash pair and an mtime pair coexist, each judged on its own", (
   assert.match(ctx, /SUMMARY\.md/); // mtime pair drifted
   assert.ok(!ctx.includes("STATE.md"), "the clean hash pair must not appear as drift");
 });
+
+// --- S1: the documented body-hash one-liner must stay linear and gate-consistent ----
+//
+// /never-stale:setup and :status ship a `node -e "..."` snippet that recomputes the
+// CLAUDE.md fence body hash. It MUST use the same linear char-scan normalize the gate
+// uses — never the trailing-anchored `/\s+$/` (or `/^\n+|\n+$/g`), which backtracks
+// catastrophically on a long non-matching run (measured ~21.6 s on a 200 KB space line)
+// and contradicts the gate's own normalize() comment. This guard extracts the REAL
+// shipped line, runs it, and asserts both its output hash and its runtime.
+const CMD_DIR = path.join(HERE, "..", "never-stale", "commands");
+
+function extractBodyHashOneLiner(file) {
+  const text = fs.readFileSync(path.join(CMD_DIR, file), "utf8");
+  assert.ok(!text.includes("\\s+$"), `${file}: ReDoS-class /\\s+$/ regex must not reappear`);
+  assert.ok(!text.includes("\\n+$/g"), `${file}: ReDoS-class /^\\n+|\\n+$/g trim must not reappear`);
+  const line = text
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l.startsWith("node -e ") && l.endsWith('" <bodyfile>'));
+  assert.ok(line, `${file}: documented body-hash one-liner not found`);
+  const m = /^node -e "(.*)" <bodyfile>$/.exec(line);
+  assert.ok(m, `${file}: body-hash one-liner has an unexpected shape`);
+  return m[1];
+}
+
+test("docs (S1): the shipped body-hash one-liner hash-matches the gate's normalize", () => {
+  // A body exercising every branch: CRLF, trailing spaces AND tabs, leading/trailing
+  // and internal blank lines.
+  const body =
+    "\r\n\r\n## Language  \r\n- spoken   \t\r\n\r\n- written\t\t\r\n## Doc\r\n- sync \r\n\r\n\r\n";
+  const bodyFile = writeText(ROOT, "fence-body.md", body);
+  const expected = syncHash(body); // gate-mirror normalize + sha256, first 16 hex
+  for (const file of ["setup.md", "status.md"]) {
+    const script = extractBodyHashOneLiner(file);
+    const r = spawnSync(process.execPath, ["-e", script, bodyFile], { encoding: "utf8" });
+    assert.equal(r.status, 0, `${file}: one-liner exited non-zero: ${r.stderr}`);
+    assert.equal(r.stdout, expected, `${file}: documented one-liner hash drifted from the gate`);
+  }
+});
+
+test("docs (S1): the shipped body-hash one-liner is linear (no ReDoS hang)", () => {
+  const evilFile = writeText(ROOT, "fence-evil.md", " ".repeat(200 * 1024) + "x");
+  const script = extractBodyHashOneLiner("setup.md");
+  const t0 = Date.now();
+  const r = spawnSync(process.execPath, ["-e", script, evilFile], { encoding: "utf8" });
+  const elapsed = Date.now() - t0;
+  assert.equal(r.status, 0, `one-liner exited non-zero: ${r.stderr}`);
+  assert.ok(elapsed < 5000, `documented one-liner must be linear; took ${elapsed}ms`);
+});
