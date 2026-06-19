@@ -25,6 +25,18 @@ v0.8.0: `never-stale/hooks/never-stale-gate.js`, `never-stale/hooks/hooks.json`,
 > they ship they need the `parseVer` date/pre-release fix and the safe-regex + input-cap mitigations
 > below. The verdict and risk analysis below are preserved as written at decision time.
 
+> **Dogfooding (this repo).** never-stale runs its own `hash` mode on itself. The marker
+> [`.claude/never-stale.json`](../.claude/never-stale.json) declares a `syncPairs` entry pairing the
+> gate (`never-stale/hooks/never-stale-gate.js`, the **source**) with this design doc (the
+> **snapshot**) — so editing the gate flags this spec for review until it is reconciled (on
+> compact, a drift note; on an edit to the gate, the reminder retargets to name this file). The
+> mark below records the gate's normalized content this doc was last reconciled to. To reconcile
+> after a real gate change: recompute the source hash with the `hash`-mode one-liner in
+> [`/never-stale:status`](../never-stale/commands/status.md), confirm this doc still reflects the
+> gate's behaviour, then replace the hex below with the new value.
+>
+> <!-- never-stale:synced-to 321aaddf211d5e8a -->
+
 ## Verdict — phase it
 
 **Adopt the direction** (deterministic, LLM-free drift detection) and the cheap,
